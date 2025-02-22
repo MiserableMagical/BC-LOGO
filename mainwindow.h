@@ -1,0 +1,53 @@
+#ifndef MAINWINDOW_H
+#define MAINWINDOW_H
+
+#include <QMainWindow>
+#include <set>
+
+QT_BEGIN_NAMESPACE
+namespace Ui {
+class MainWindow;
+}
+QT_END_NAMESPACE
+
+using std::set;
+using std::map;
+using std::vector;
+
+class MainWindow : public QMainWindow
+{
+    Q_OBJECT
+
+    int rec_layers = 0;
+    bool reDef = false;
+    QString Def_name = QString();
+    int Def_id = -1;
+
+    map<QString, int> ProcNames;
+    vector<QStringList> Procs;
+public:
+    QString cmd_buf;
+    bool Defmode = false;
+    MainWindow(QWidget *parent = nullptr);
+    ~MainWindow();
+    void launchEditor();
+    void readFile();
+    void openFile();
+    void loadFile();
+    bool saveFile(QString path);
+    void onSaveasFile();
+    void modifyText();
+    void apply(QString &str,bool echo = true);
+    void setListenerText(QString str);
+    void initPArea();
+    void initListener();
+
+    //parser
+    void singleStepParser(QString text);
+    bool Parser(QString text);
+    qreal eval(QString &expr,bool &isValid);
+
+private:
+    Ui::MainWindow *ui;
+};
+#endif // MAINWINDOW_H
