@@ -3,6 +3,7 @@
 
 #include <QMainWindow>
 #include <set>
+#include "lexer.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui {
@@ -25,6 +26,7 @@ class MainWindow : public QMainWindow
 
     map<QString, int> ProcNames;
     vector<QStringList> Procs;
+    vector<vector<vector<Token>>> ProcTokens;
 public:
     QString cmd_buf;
     bool Defmode = false;
@@ -44,7 +46,9 @@ public:
 
     //parser
     void singleStepParser(QString text);
-    bool Parser(QString text);
+    bool Parser(std::vector<Token> &);
+    double getNum(std::vector<Token>&, bool&);
+    void Tokenize(QString &,std::vector<Token> &);
     qreal eval(QString &expr,bool &isValid);
 
 private:

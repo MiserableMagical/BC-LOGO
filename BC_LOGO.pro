@@ -14,6 +14,7 @@ SOURCES += \
     editor.cpp \
     eval.cpp \
     highlight.cpp \
+    lexer.cpp \
     main.cpp \
     mainwindow.cpp \
     mylistener.cpp \
@@ -23,6 +24,7 @@ SOURCES += \
 HEADERS += \
     _cursor.h \
     editor.h \
+    lexer.h \
     mainwindow.h \
     mylistener.h \
     paint.h

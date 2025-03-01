@@ -3,7 +3,8 @@
 #include "QTextCharFormat"
 
 using std::set;
-extern set<QString> defaultNames;
+using std::map;
+extern map<QString,Keywords> defaultNames;
 
 MyHighlighter::MyHighlighter(QTextDocument *parent)
     : QSyntaxHighlighter(parent) {
@@ -27,7 +28,7 @@ MyHighlighter::MyHighlighter(QTextDocument *parent)
     //                << "\\breturn\\b" << "\\bclass\\b" << "\\bvoid\\b";
     for(auto &str : defaultNames)
     {
-        keywordPatterns << "\\b" + str + "\\b";
+        keywordPatterns << "\\b" + str.first + "\\b";
     }
     //keywordPatterns << "\\bREPEAT\\b" << "\\bTO\\b" << "";
 

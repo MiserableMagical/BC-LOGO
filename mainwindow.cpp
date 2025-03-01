@@ -43,6 +43,36 @@ void MainWindow::modifyText()//执行命令，作用同apply
     apply(curstr, 0);
 }
 
+void MainWindow::Tokenize(QString &str,std::vector<Token> &tokens)
+{
+    Lexer * lexer = new Lexer(str);
+
+    Token token;
+    do {
+        token = lexer->nextToken();
+        tokens.push_back(token);
+    } while (token.type != TokenType::END_OF_INPUT &&
+             token.type != TokenType::INVALID);
+    delete lexer;
+}
+
+QString tokenTypeToString(TokenType type) {
+    switch (type) {
+    case TokenType::KEYWORD: return "KEYWORD";
+    case TokenType::IDENTIFIER: return "IDENTIFIER";
+    case TokenType::NUMBER: return "NUMBER";
+    case TokenType::OPERATOR: return "OPERATOR";
+    case TokenType::LPAREN: return "LPAREN";
+    case TokenType::RPAREN: return "RPAREN";
+    case TokenType::LBRACKET: return "LBRACKET";
+    case TokenType::RBRACKET: return "RBRACKET";
+    case TokenType::COMMA: return "COMMA";
+    case TokenType::SEMICOLON: return "SEMICOLON";
+    case TokenType::END_OF_INPUT: return "END_OF_INPUT";
+    case TokenType::INVALID: return "INVALID";
+    default: return "UNKNOWN";
+    }
+}
 
 void MainWindow::apply(QString &str,bool echo)//现在echo只为false
 {
@@ -51,7 +81,16 @@ void MainWindow::apply(QString &str,bool echo)//现在echo只为false
         if(echo)
             setListenerText(str);
         //singleStepParser(curstr);
-        Parser(str);
+        //Parser(str);
+        vector<Token> tokens;
+        Tokenize(str, tokens);
+        std::reverse(tokens.begin(),tokens.end());
+        for (const auto& t : tokens) {
+            qDebug() << "Type: " << tokenTypeToString(t.type)
+            << "\tLexeme: " << t.lexeme << "\tLine: " << t.line
+                     << "\tColumn: " << t.column;
+        }
+        Parser(tokens);
         if(Defmode)
             ui->DefHint->show();
     }
@@ -69,6 +108,10 @@ void MainWindow::apply(QString &str,bool echo)//现在echo只为false
         if(echo)
             setListenerText("> " + str);
         Procs[Def_id].append(str);
+        vector<Token> curstr;
+        Tokenize(str, curstr);
+        reverse(curstr.begin(),curstr.end());
+        ProcTokens[Def_id].push_back(curstr);
     }
 }
 
