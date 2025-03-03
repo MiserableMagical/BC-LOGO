@@ -49,7 +49,8 @@ public:
     bool Parser(std::vector<Token> &);
     double getNum(std::vector<Token>&, bool&);
     void Tokenize(QString &,std::vector<Token> &);
-    qreal eval(QString &expr,bool &isValid);
+    void getExpBound(std::vector<Token>&,std::vector<Token>&,int&);
+    qreal eval(vector<Token>&,bool &isValid);
 
 private:
     Ui::MainWindow *ui;

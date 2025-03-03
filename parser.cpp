@@ -73,7 +73,7 @@ bool checkBrackets(QString &text)
     return cur == 0;
 }
 
-double MainWindow::getNum(std::vector<Token> & tokens, bool &ok)
+/*double MainWindow::getNum(std::vector<Token> & tokens, bool &ok)
 {
     ok = true;
     if(tokens.size() == 0 || tokens.back().type != TokenType::NUMBER) {
@@ -84,6 +84,40 @@ double MainWindow::getNum(std::vector<Token> & tokens, bool &ok)
     double res = tokens.back().numberValue;
     tokens.pop_back();
     return res;
+}*/
+
+void MainWindow::getExpBound(std::vector<Token> & tokens,std::vector<Token> & exp,int &result)
+{
+    if(tokens.size() == 0 || (tokens.back().type != TokenType::NUMBER && tokens.back().type != TokenType::LPAREN && tokens.back().type != TokenType::RPAREN)) {
+        Report("This procedure needs more input(s)");
+        result = -1;
+        return;
+    }
+    while(!tokens.empty() && ((tokens.back().type == TokenType::NUMBER
+                                || tokens.back().type == TokenType::LPAREN
+                                || tokens.back().type == TokenType::RPAREN
+                                || tokens.back().type == TokenType::OPERATOR)))
+    {
+        exp.push_back(tokens.back());
+        tokens.pop_back();
+    }
+    //reverse(exp.begin(),exp.end());
+    //for(auto c : exp) qDebug() << "!" << c.lexeme;
+}
+
+double MainWindow::getNum(std::vector<Token> & tokens, bool &ok)
+{
+    ok = true;
+    std::vector<Token> exp;
+    int state = 0;
+    getExpBound(tokens, exp, state);
+    if(state == -1) {
+        ok = false;
+        return 0;
+    }
+    double res = eval(exp, ok);
+    if(ok) return res;
+    return 0;
 }
 
 bool MainWindow::Parser(std::vector<Token> & tokens)
@@ -299,6 +333,20 @@ bool MainWindow::Parser(std::vector<Token> & tokens)
         if(ok == false)
             return false;
         PArea->setW(num);
+        return Parser(tokens);
+    }
+
+    if(word.type == TokenType::NUMBER)
+    {
+        tokens.push_back(word);
+        bool ok;
+        qreal num = getNum(tokens, ok);
+        if(ok == false)
+        {
+            Report("Invalid Expression");
+            return false;
+        }
+        Report("Result is : " + QString::number(num));
         return Parser(tokens);
     }
 

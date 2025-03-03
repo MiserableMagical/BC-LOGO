@@ -22,19 +22,18 @@ bool hasHigherPrecedence(QChar op1, QChar op2) {
     return precedence[op1] >= precedence[op2];
 }
 
-qreal MainWindow::eval(QString &expr, bool &isValid)
+qreal MainWindow::eval(vector<Token> &expr, bool &isValid)
 {
     isValid = true;
     std::stack<QChar> stack;
     QString Num;
     std::vector<QString> post;
 
-    for (QChar c : expr) {
+    for (auto c : expr) {
         // 如果是操作数，直接添加到后缀表达式
-        if (('0' <= c && c <= '9') || (!Num.isEmpty() && c == '.')) {
+        /*if (('0' <= c && c <= '9') || (!Num.isEmpty() && c == '.')) {
             Num += c;
         }
-        // 如果是左括号，压入栈
         else
         {
             if(!Num.isEmpty()) {
@@ -45,7 +44,6 @@ qreal MainWindow::eval(QString &expr, bool &isValid)
             if(c == '(') {
                 stack.push(c);
             }
-            // 如果是右括号，弹出栈中的元素直到遇到左括号
             else if (c == ')') {
                 while (!stack.empty() && stack.top() != '(') {
                     post.push_back(stack.top());
@@ -59,13 +57,46 @@ qreal MainWindow::eval(QString &expr, bool &isValid)
                 }
                 stack.pop();  // 弹出左括号
             }
-            // 如果是运算符
             else if (isOperator(c)) {
                 while (!stack.empty() && stack.top() != '(' && hasHigherPrecedence(stack.top(), c)) {
                     post.push_back(stack.top());
                     stack.pop();
                 }
                 stack.push(c);
+            }
+            else {
+                isValid = false;
+                return 0;
+            }
+        }*/
+        if(c.type == TokenType::NUMBER)
+        {
+            post.push_back(c.lexeme);
+        }
+        else
+        {
+            if(c.type == TokenType::LPAREN) {
+                stack.push('(');
+            }
+            else if(c.type == TokenType::RPAREN) {
+                while(!stack.empty() && stack.top() != '(') {
+                    post.push_back(stack.top());
+                    stack.pop();
+                }
+                if(stack.empty())
+                {
+                    setListenerText("Invalid Expression : parentheses don't match");
+                    isValid = false;
+                    return 0;
+                }
+                stack.pop();
+            }
+            else if(c.type == TokenType::OPERATOR) {
+                while (!stack.empty() && stack.top() != '(' && hasHigherPrecedence(stack.top(), c.lexeme[0])) {
+                    post.push_back(stack.top());
+                    stack.pop();
+                }
+                stack.push(c.lexeme[0]);
             }
             else {
                 isValid = false;
