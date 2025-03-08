@@ -151,15 +151,6 @@ bool MainWindow::Parser(std::vector<Token> & tokens)
             return false;
         Wait(num);
         return Parser(tokens);
-        /*QString num = text.section(' ',1,1);
-        bool isValid = true;
-        double res = eval(num, isValid);
-        if(num.isEmpty() || !isValid) {
-            Report("Syntax Error : [NUMBER] parameter missing");
-            return false;
-        }
-        Wait(res);
-        return Parser(text.section(' ',2));*/
     }
 
     if(word.type == TokenType::KEYWORD && word.lexeme == "TO")
@@ -232,8 +223,8 @@ bool MainWindow::Parser(std::vector<Token> & tokens)
             tokens.pop_back();
             switch(curToken.type)
             {
-            case TokenType::LBRACKET: layer++;
-            case TokenType::RBRACKET: layer--;
+            case TokenType::LBRACKET: layer++;repPat.push_back(curToken);break;
+            case TokenType::RBRACKET: layer--;repPat.push_back(curToken);break;
             default:
                 repPat.push_back(curToken);
                 break;

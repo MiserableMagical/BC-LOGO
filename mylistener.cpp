@@ -28,10 +28,17 @@ void myListener::keyReleaseEvent(QKeyEvent* e)//回车
             QTextCursor cursor = this->textCursor();
             cursor.movePosition(QTextCursor::End);
             cursor.movePosition(QTextCursor::StartOfLine, QTextCursor::KeepAnchor);
+            auto tmpText = cursor.selection().toPlainText();
+            if(!tmpText.isEmpty()) cursor.removeSelectedText();
             cursor.movePosition(QTextCursor::Up, QTextCursor::KeepAnchor);
-            pMainWind -> cmd_buf = cursor.selection().toPlainText();
-            //qDebug() << pMainWind -> cmd_buf;
+
+            pMainWind -> cmd_buf = cursor.selection().toPlainText() + tmpText;
+
+            cursor.movePosition(QTextCursor::EndOfLine, QTextCursor::KeepAnchor);
+            if(!tmpText.isEmpty()) cursor.insertText(tmpText + '\n');
+
             pMainWind -> modifyText();
+            //qDebug() << pMainWind -> cmd_buf;
         }
     }
 }

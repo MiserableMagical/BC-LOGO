@@ -30,45 +30,6 @@ qreal MainWindow::eval(vector<Token> &expr, bool &isValid)
     std::vector<QString> post;
 
     for (auto c : expr) {
-        // 如果是操作数，直接添加到后缀表达式
-        /*if (('0' <= c && c <= '9') || (!Num.isEmpty() && c == '.')) {
-            Num += c;
-        }
-        else
-        {
-            if(!Num.isEmpty()) {
-                //std::reverse(Num.begin(),Num.end());
-                post.push_back(Num);
-                Num = "";
-            }
-            if(c == '(') {
-                stack.push(c);
-            }
-            else if (c == ')') {
-                while (!stack.empty() && stack.top() != '(') {
-                    post.push_back(stack.top());
-                    stack.pop();
-                }
-                if(stack.empty())
-                {
-                    setListenerText("Invalid Expression : parentheses don't match");
-                    isValid = false;
-                    return 0;
-                }
-                stack.pop();  // 弹出左括号
-            }
-            else if (isOperator(c)) {
-                while (!stack.empty() && stack.top() != '(' && hasHigherPrecedence(stack.top(), c)) {
-                    post.push_back(stack.top());
-                    stack.pop();
-                }
-                stack.push(c);
-            }
-            else {
-                isValid = false;
-                return 0;
-            }
-        }*/
         if(c.type == TokenType::NUMBER)
         {
             post.push_back(c.lexeme);
