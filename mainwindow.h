@@ -25,6 +25,7 @@ class MainWindow : public QMainWindow
     int Def_id = -1;
 
     map<QString, int> ProcNames;
+    map<QString, qreal> varNames;
     vector<QStringList> Procs;
     vector<vector<vector<Token>>> ProcTokens;
 public:

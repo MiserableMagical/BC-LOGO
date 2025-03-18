@@ -41,7 +41,8 @@ map<QString, Keywords> defaultNames = {
     {"TO",Keywords::TO},
     {"END",Keywords::END},
     {"HOME",Keywords::HOME},
-    {"SETW",Keywords::SETW}
+    {"SETW",Keywords::SETW},
+    {"MAKE",Keywords::MAKE}
 };
 
 Keywords keyConvert(QString name) {
@@ -86,25 +87,34 @@ bool checkBrackets(QString &text)
     return res;
 }*/
 
+//找到该表达式的范围
 void MainWindow::getExpBound(std::vector<Token> & tokens,std::vector<Token> & exp,int &result)
 {
-    if(tokens.size() == 0 || (tokens.back().type != TokenType::NUMBER && tokens.back().type != TokenType::LPAREN && tokens.back().type != TokenType::RPAREN)) {
-        Report("This procedure needs more input(s)");
-        result = -1;
-        return;
-    }
+
+    bool ran = false;
     while(!tokens.empty() && ((tokens.back().type == TokenType::NUMBER
                                 || tokens.back().type == TokenType::LPAREN
                                 || tokens.back().type == TokenType::RPAREN
-                                || tokens.back().type == TokenType::OPERATOR)))
+                                || tokens.back().type == TokenType::OPERATOR
+                                || tokens.back().type == TokenType::IDENTIFIER)))
     {
+        ran = true;
+        if(tokens.back().type == TokenType::IDENTIFIER) {// check if it's a variable
+            if(!varNames.count(tokens.back().lexeme)) break;
+        }
         exp.push_back(tokens.back());
         tokens.pop_back();
+    }
+    if(ran == false) {
+        Report("This procedure needs more input(s)");
+        result = -1;
+        return;
     }
     //reverse(exp.begin(),exp.end());
     //for(auto c : exp) qDebug() << "!" << c.lexeme;
 }
 
+//计算下一个参数的数值
 double MainWindow::getNum(std::vector<Token> & tokens, bool &ok)
 {
     ok = true;
@@ -143,6 +153,36 @@ bool MainWindow::Parser(std::vector<Token> & tokens)
         return true;
     //word = word.toUpper();
 
+    if(word.type == TokenType::KEYWORD && word.lexeme == "MAKE")
+    {
+        if(tokens.empty())
+        {
+            Report("This procedure(TO) needs more input(s)");
+            return false;
+        }
+        Token nextToken = tokens.back();
+        tokens.pop_back();
+        if(!(nextToken.type == TokenType::KEYWORD || nextToken.type == TokenType::IDENTIFIER))
+        {
+            Report("This procedure(TO) needs more input(s)");
+            return false;
+        }
+        QString name = nextToken.lexeme;
+        name = name.toUpper();
+        if(defaultNames.count(name) || ProcNames.count(name))
+        {
+            Report(name + " is already in use.Try a different name.");
+            return false;
+        }
+        bool ok;
+        double num = getNum(tokens, ok);
+        if(ok == false)
+            return false;
+        qDebug() << name << ' ' << num;
+        varNames[name] = num;
+        return Parser(tokens);
+    }
+
     if(word.type == TokenType::KEYWORD && word.lexeme == "WAIT")
     {
         bool ok;
@@ -169,7 +209,7 @@ bool MainWindow::Parser(std::vector<Token> & tokens)
         }
         QString name = nextToken.lexeme;
         name = name.toUpper();
-        if(defaultNames.count(name))
+        if(defaultNames.count(name) || varNames.count(name))
         {
             Report(name + " is already in use.Try a different name.");
             return false;
@@ -207,6 +247,7 @@ bool MainWindow::Parser(std::vector<Token> & tokens)
     {
         bool ok;
         double num = getNum(tokens, ok);
+        num = floor(num + 1e-6);
         if(ok == false)
             return false;
 
@@ -327,7 +368,7 @@ bool MainWindow::Parser(std::vector<Token> & tokens)
         return Parser(tokens);
     }
 
-    if(word.type == TokenType::NUMBER)
+    if(word.type == TokenType::NUMBER || (word.type == TokenType::IDENTIFIER && varNames.count(word.lexeme)))
     {
         tokens.push_back(word);
         bool ok;
@@ -341,7 +382,7 @@ bool MainWindow::Parser(std::vector<Token> & tokens)
         return Parser(tokens);
     }
 
-    if(ProcNames.count(word.lexeme))
+    if(ProcNames.count(word.lexeme))//a process(without parameters)
     {
         qDebug() << "!!!";
         rec_layers++;

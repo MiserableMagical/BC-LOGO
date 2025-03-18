@@ -34,6 +34,10 @@ qreal MainWindow::eval(vector<Token> &expr, bool &isValid)
         {
             post.push_back(c.lexeme);
         }
+        else if(c.type == TokenType::IDENTIFIER && varNames.count(c.lexeme))
+        {
+            post.push_back(QString::number(varNames[c.lexeme]));
+        }
         else
         {
             if(c.type == TokenType::LPAREN) {

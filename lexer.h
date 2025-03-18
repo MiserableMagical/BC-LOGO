@@ -37,7 +37,8 @@ enum class Keywords {
     TO,
     END,
     HOME,
-    SETW
+    SETW,
+    MAKE
 };
 
 struct Token {
