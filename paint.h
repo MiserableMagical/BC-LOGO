@@ -31,7 +31,7 @@ class QFrame_ : public QFrame{
         painter.drawPath(path);
     }*/
 public : QPixmap *pixmap = new QPixmap(900, 400);
-    double x,y;
+    double x,y;//当前位置
     int penw = 1;
     public : void paintEvent(QPaintEvent * event)
     {
@@ -39,6 +39,7 @@ public : QPixmap *pixmap = new QPixmap(900, 400);
         painter.setRenderHint(QPainter::SmoothPixmapTransform);
         painter.drawPixmap(0,0,*pixmap);
     }
+    //Line : 移到下一个位置并连线
     void Line(double x1,double y1)
     {
         QPainter painter(pixmap);

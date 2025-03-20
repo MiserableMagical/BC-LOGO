@@ -42,7 +42,8 @@ map<QString, Keywords> defaultNames = {
     {"END",Keywords::END},
     {"HOME",Keywords::HOME},
     {"SETW",Keywords::SETW},
-    {"MAKE",Keywords::MAKE}
+    {"MAKE",Keywords::MAKE},
+    {"PRINT",Keywords::PRINT}
 };
 
 Keywords keyConvert(QString name) {

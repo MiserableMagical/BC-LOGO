@@ -38,7 +38,8 @@ enum class Keywords {
     END,
     HOME,
     SETW,
-    MAKE
+    MAKE,
+    PRINT
 };
 
 struct Token {
