@@ -53,6 +53,10 @@ public:
     void getExpBound(std::vector<Token>&,std::vector<Token>&,int&);
     qreal eval(vector<Token>&,bool &isValid);
 
+    //separate functions
+    bool dealPrint(vector<Token>&);
+    bool dealsetPC(vector<Token>&);
+
 private:
     Ui::MainWindow *ui;
 };

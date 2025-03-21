@@ -9,7 +9,8 @@
 #include "QMessageBox"
 #include "mylistener.h"
 
-QString curText = "Beacon's Logo V0.1.0 for Windows x64\nWenkai Cheng\n";
+QString version = "V0.2[250321]";
+QString curText = "Beacon's Logo " + version + " for Windows x64\nWenkai Cheng\n";
 
 myListener *Lis;
 
@@ -212,7 +213,7 @@ void MainWindow::initListener()
 {
     Lis = new myListener;
     Lis->setParent(this);
-    Lis->resize(920,220);
+    Lis->resize(900,220);
     Lis->move(40,498);
     Lis->register_key_enter_handler(this);
     Lis->show();

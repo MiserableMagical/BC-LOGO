@@ -64,7 +64,7 @@ Token Lexer::parseIdentifierOrKeyword() {
     int start_line = line_;
     int start_col = column_;
 
-    while (isalnum(currentChar()) || currentChar() == '_') {
+    while (isalnum(currentChar()) || currentChar() == '#' || currentChar() == '_') {
         QChar c = currentChar();
         if(c.isLower()) c = c.toUpper();
         lexeme += c;
@@ -82,7 +82,7 @@ Token Lexer::nextToken() {
     }
 
     QChar c = currentChar();
-    if (c.isLetter()) {
+    if (c.isLetter() || c == '#') {
         return parseIdentifierOrKeyword();
     }
     else if (c.isDigit() || c == '.') {

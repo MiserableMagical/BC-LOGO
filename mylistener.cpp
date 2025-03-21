@@ -28,6 +28,7 @@ void myListener::keyReleaseEvent(QKeyEvent* e)//回车
             QTextCursor cursor = this->textCursor();
             cursor.movePosition(QTextCursor::End);
             cursor.movePosition(QTextCursor::StartOfLine, QTextCursor::KeepAnchor);
+            //试图将光标后的内容移回原位
             auto tmpText = cursor.selection().toPlainText();
             if(!tmpText.isEmpty()) cursor.removeSelectedText();
             cursor.movePosition(QTextCursor::Up, QTextCursor::KeepAnchor);

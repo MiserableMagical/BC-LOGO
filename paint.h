@@ -33,6 +33,7 @@ class QFrame_ : public QFrame{
 public : QPixmap *pixmap = new QPixmap(900, 400);
     double x,y;//当前位置
     int penw = 1;
+    QColor penc = Qt::black;
     public : void paintEvent(QPaintEvent * event)
     {
         QPainter painter(this);
@@ -49,7 +50,7 @@ public : QPixmap *pixmap = new QPixmap(900, 400);
         painter.setRenderHint(QPainter::Antialiasing);
         painter.setRenderHint(QPainter::SmoothPixmapTransform);
         brush.setColor(Qt::white);
-        pen.setColor(Qt::black);
+        pen.setColor(penc);
         pen.setWidth(penw);
         painter.setBrush(brush);
         painter.setPen(pen);
@@ -108,6 +109,7 @@ class PaintArea{
     void turnLeft(double deg);
     void turnRight(double deg);
     void setW(int width);
+    void setPC(QColor);
     void clearScreen();
     void showTurtle();
     void hideTurtle();

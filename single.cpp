@@ -61,6 +61,10 @@ void PaintArea::setW(int width){
     frame->penw = width;
 }
 
+void PaintArea::setPC(QColor col){
+    frame->penc = col;
+}
+
 void PaintArea::Forward(double dis){
     auto vec = cursor.Vector(dis);
     //int turns = std::max(Turns_X(cursor.X + vec.first), Turns_Y(cursor.Y + vec.second));

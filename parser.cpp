@@ -43,7 +43,8 @@ map<QString, Keywords> defaultNames = {
     {"HOME",Keywords::HOME},
     {"SETW",Keywords::SETW},
     {"MAKE",Keywords::MAKE},
-    {"PRINT",Keywords::PRINT}
+    {"PRINT",Keywords::PRINT},
+    {"SETPC",Keywords::SETPC}
 };
 
 Keywords keyConvert(QString name) {
@@ -131,6 +132,32 @@ double MainWindow::getNum(std::vector<Token> & tokens, bool &ok)
     return 0;
 }
 
+bool MainWindow::dealPrint(std::vector<Token> & tokens)
+{
+    bool ok;
+    double num = getNum(tokens, ok);
+    if(ok == false)
+        return false;
+    Report(QString::number(num));
+    return true;
+}
+
+bool MainWindow::dealsetPC(std::vector<Token> & tokens)
+{
+    if(tokens.empty() || tokens.back().type != TokenType::IDENTIFIER)
+    {
+        Report("This procedure(SETPC) needs more input(s)");
+        return false;
+    }
+    Token Word = tokens.back();
+    tokens.pop_back();
+    QString word = Word.lexeme;
+
+    QColor color(word);
+    PArea->setPC(color);
+    return true;
+}
+
 bool MainWindow::Parser(std::vector<Token> & tokens)
 {
 
@@ -153,6 +180,11 @@ bool MainWindow::Parser(std::vector<Token> & tokens)
     if(word.type == TokenType::END_OF_INPUT)
         return true;
     //word = word.toUpper();
+
+    if(word.type == TokenType::KEYWORD && word.lexeme == "PRINT") {
+        if(!dealPrint(tokens)) return false;
+        return Parser(tokens);
+    }
 
     if(word.type == TokenType::KEYWORD && word.lexeme == "MAKE")
     {
@@ -369,6 +401,12 @@ bool MainWindow::Parser(std::vector<Token> & tokens)
         return Parser(tokens);
     }
 
+    if(word.type == TokenType::KEYWORD && keyConvert(word.lexeme) == Keywords::SETPC)
+    {
+        if(!dealsetPC(tokens)) return false;
+        return Parser(tokens);
+    }
+
     if(word.type == TokenType::NUMBER || (word.type == TokenType::IDENTIFIER && varNames.count(word.lexeme)))
     {
         tokens.push_back(word);
@@ -385,7 +423,6 @@ bool MainWindow::Parser(std::vector<Token> & tokens)
 
     if(ProcNames.count(word.lexeme))//a process(without parameters)
     {
-        qDebug() << "!!!";
         rec_layers++;
         int id = ProcNames[word.lexeme];
 
