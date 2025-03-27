@@ -49,7 +49,7 @@ MyHighlighter::MyHighlighter(QTextDocument *parent)
 
     //Highlight for brackets
     HighlightingRule brkRule;
-    brkRule.pattern = QRegularExpression("[\\[\\]]");
+    brkRule.pattern = QRegularExpression("[\\[\\]()]");
     brkRule.pattern.setPatternOptions(QRegularExpression::CaseInsensitiveOption);
     brkRule.format = brkFormat;
     highlightingRules.append(brkRule);

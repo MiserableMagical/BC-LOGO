@@ -59,6 +59,7 @@ Token Lexer::parseNumber() {
     return Token(TokenType::NUMBER, lexeme, lexeme.toDouble(), start_line, start_col);
 }
 
+//parse Identifier or keyword, but specially treat "AND" "OR"
 Token Lexer::parseIdentifierOrKeyword() {
     QString lexeme;
     int start_line = line_;
@@ -72,6 +73,17 @@ Token Lexer::parseIdentifierOrKeyword() {
     }
 
     TokenType type = defaultNames.count(lexeme) ? TokenType::KEYWORD : TokenType::IDENTIFIER;
+
+    if(lexeme == "AND") {
+        lexeme = "&";
+        type = TokenType::OPERATOR;
+    }
+
+    if(lexeme == "OR") {
+        lexeme = "|";
+        type = TokenType::OPERATOR;
+    }
+
     return Token(type, lexeme, 0, start_line, start_col);
 }
 
@@ -101,7 +113,7 @@ Token Lexer::nextToken() {
         case ']': return Token(TokenType::RBRACKET, charStr, 0, start_line, start_col);
         case ',': return Token(TokenType::COMMA, charStr, 0, start_line, start_col);
         case ';': return Token(TokenType::SEMICOLON, charStr, 0, start_line, start_col);
-        case '+': case '-': case '*': case '/':
+        case '+': case '-': case '*': case '/': case '>': case '<': case '=':
             return Token(TokenType::OPERATOR, charStr, 0, start_line, start_col);
         default:
             return Token(TokenType::INVALID, charStr, 0, start_line, start_col);

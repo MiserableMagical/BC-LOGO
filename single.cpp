@@ -65,6 +65,7 @@ void PaintArea::setPC(QColor col){
     frame->penc = col;
 }
 
+//处理前进操作与边界问题
 void PaintArea::Forward(double dis){
     auto vec = cursor.Vector(dis);
     //int turns = std::max(Turns_X(cursor.X + vec.first), Turns_Y(cursor.Y + vec.second));

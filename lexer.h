@@ -40,7 +40,9 @@ enum class Keywords {
     SETW,
     MAKE,
     PRINT,
-    SETPC
+    SETPC,
+    IF,
+    PLACEHOLDER
 };
 
 struct Token {

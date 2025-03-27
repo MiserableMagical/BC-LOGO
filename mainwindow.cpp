@@ -116,6 +116,7 @@ void MainWindow::apply(QString &str,bool echo)//现在echo只为false
     }
 }
 
+//加载过程
 void MainWindow::loadFile()
 {
     QString fname = QFileDialog::getOpenFileName(this,"选择一个文件...",QString(),"LOGO Files(*.lgo)");
@@ -181,6 +182,7 @@ void MainWindow::onSaveasFile()
 
 std::vector<editor*> editPool;
 std::vector<MyHighlighter*> HltPool;
+//新建一个编辑器
 void MainWindow::launchEditor(){
     editor* edit = new editor;
     editPool.push_back(edit);
@@ -188,6 +190,7 @@ void MainWindow::launchEditor(){
     HltPool.push_back(highlighter);
 }
 
+//用编辑器打开文件
 void MainWindow::openFile()
 {
     QString path = QFileDialog::getOpenFileName(this,"选择一个文件...",QString(),"LOGO Files(*.lgo)");

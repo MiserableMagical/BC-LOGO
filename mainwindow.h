@@ -56,6 +56,9 @@ public:
     //separate functions
     bool dealPrint(vector<Token>&);
     bool dealsetPC(vector<Token>&);
+    bool dealLT(vector<Token>&);
+    bool dealRT(vector<Token>&);
+    bool dealsetW(vector<Token>&);
 
 private:
     Ui::MainWindow *ui;

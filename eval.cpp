@@ -5,27 +5,41 @@
 #include "mainwindow.h"
 #include <stack>
 
-std::unordered_map<QChar, int> precedence = {
-    {'+', 1},
-    {'-', 1},
-    {'*', 2},
-    {'/', 2},
+std::unordered_map<QString, int> precedence = {
+    {"=",1},
+    {">",2},
+    {"<",2},
+    {">=",2},
+    {"<=",2},
+    {"|", 51},
+    {"&", 52},
+    {"+", 101},
+    {"-", 101},
+    {"*", 102},
+    {"/", 102},
 };
 
 // 判断字符是否为运算符
-bool isOperator(QChar c) {
+bool isOperator(QString c) {
     return precedence.find(c) != precedence.end();
 }
 
 // 比较两个运算符的优先级
-bool hasHigherPrecedence(QChar op1, QChar op2) {
+bool hasHigherPrecedence(QString op1, QString op2) {
     return precedence[op1] >= precedence[op2];
+}
+
+const qreal Epsilon = 1e-9;
+bool Truth(qreal val)
+{
+    if(abs(val) < Epsilon) return 0;
+    return 1;
 }
 
 qreal MainWindow::eval(vector<Token> &expr, bool &isValid)
 {
     isValid = true;
-    std::stack<QChar> stack;
+    std::stack<QString> stack;
     QString Num;
     std::vector<QString> post;
 
@@ -41,10 +55,10 @@ qreal MainWindow::eval(vector<Token> &expr, bool &isValid)
         else
         {
             if(c.type == TokenType::LPAREN) {
-                stack.push('(');
+                stack.push("(");
             }
             else if(c.type == TokenType::RPAREN) {
-                while(!stack.empty() && stack.top() != '(') {
+                while(!stack.empty() && stack.top() != "(") {
                     post.push_back(stack.top());
                     stack.pop();
                 }
@@ -57,7 +71,7 @@ qreal MainWindow::eval(vector<Token> &expr, bool &isValid)
                 stack.pop();
             }
             else if(c.type == TokenType::OPERATOR) {
-                while (!stack.empty() && stack.top() != '(' && hasHigherPrecedence(stack.top(), c.lexeme[0])) {
+                while (!stack.empty() && stack.top() != "(" && hasHigherPrecedence(stack.top(), c.lexeme[0])) {
                     post.push_back(stack.top());
                     stack.pop();
                 }
@@ -83,7 +97,7 @@ qreal MainWindow::eval(vector<Token> &expr, bool &isValid)
     std::stack<qreal> results;
     for(QString &cur : post)
     {
-        if(cur == "+" || cur == "-" || cur == "*" || cur == "/")
+        if(precedence.count(cur[0]) /*cur == "+" || cur == "-" || cur == "*" || cur == "/"*/)
         {
             if(results.size() < 2)
             {
@@ -103,6 +117,20 @@ qreal MainWindow::eval(vector<Token> &expr, bool &isValid)
                 results.push(fir * sec);
             if(cur == "/")
                 results.push(fir / sec);
+            if(cur == "&")
+                results.push(Truth(fir) && Truth(sec));
+            if(cur == "|")
+                results.push(Truth(fir) || Truth(sec));
+            if(cur == ">")
+                results.push(fir > sec);
+            if(cur == "<")
+                results.push(fir < sec);
+            if(cur == ">=")
+                results.push(fir >= sec);
+            if(cur == "<=")
+                results.push(fir <= sec);
+            if(cur == "=")
+                results.push(abs(fir - sec) < Epsilon);
         }
         else
         {

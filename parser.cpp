@@ -44,7 +44,10 @@ map<QString, Keywords> defaultNames = {
     {"SETW",Keywords::SETW},
     {"MAKE",Keywords::MAKE},
     {"PRINT",Keywords::PRINT},
-    {"SETPC",Keywords::SETPC}
+    {"SETPC",Keywords::SETPC},
+    {"AND",Keywords::PLACEHOLDER},
+    {"OR",Keywords::PLACEHOLDER},
+    {"IF",Keywords::IF}
 };
 
 Keywords keyConvert(QString name) {
@@ -93,21 +96,21 @@ bool checkBrackets(QString &text)
 void MainWindow::getExpBound(std::vector<Token> & tokens,std::vector<Token> & exp,int &result)
 {
 
-    bool ran = false;
+    bool nonEmpty = false;
     while(!tokens.empty() && ((tokens.back().type == TokenType::NUMBER
                                 || tokens.back().type == TokenType::LPAREN
                                 || tokens.back().type == TokenType::RPAREN
                                 || tokens.back().type == TokenType::OPERATOR
                                 || tokens.back().type == TokenType::IDENTIFIER)))
     {
-        ran = true;
+        nonEmpty = true;
         if(tokens.back().type == TokenType::IDENTIFIER) {// check if it's a variable
             if(!varNames.count(tokens.back().lexeme)) break;
         }
         exp.push_back(tokens.back());
         tokens.pop_back();
     }
-    if(ran == false) {
+    if(nonEmpty == false) {
         Report("This procedure needs more input(s)");
         result = -1;
         return;
@@ -131,6 +134,9 @@ double MainWindow::getNum(std::vector<Token> & tokens, bool &ok)
     if(ok) return res;
     return 0;
 }
+
+
+/*以下为关键字读入处理部分*/
 
 bool MainWindow::dealPrint(std::vector<Token> & tokens)
 {
@@ -157,6 +163,38 @@ bool MainWindow::dealsetPC(std::vector<Token> & tokens)
     PArea->setPC(color);
     return true;
 }
+
+bool MainWindow::dealsetW(std::vector<Token> & tokens)
+{
+    bool ok;
+    double num = getNum(tokens, ok);
+    if(ok == false)
+        return false;
+    PArea->setW(num);
+    return true;
+}
+
+bool MainWindow::dealLT(std::vector<Token> & tokens)
+{
+    bool ok;
+    double num = getNum(tokens, ok);
+    if(ok == false)
+        return false;
+    PArea->turnLeft(num);
+    return true;
+}
+
+bool MainWindow::dealRT(std::vector<Token> & tokens)
+{
+    bool ok;
+    double num = getNum(tokens, ok);
+    if(ok == false)
+        return false;
+    PArea->turnRight(num);
+    return true;
+}
+
+/*以上为关键字读入处理部分*/
 
 bool MainWindow::Parser(std::vector<Token> & tokens)
 {
@@ -207,6 +245,7 @@ bool MainWindow::Parser(std::vector<Token> & tokens)
             Report(name + " is already in use.Try a different name.");
             return false;
         }
+
         bool ok;
         double num = getNum(tokens, ok);
         if(ok == false)
@@ -373,31 +412,19 @@ bool MainWindow::Parser(std::vector<Token> & tokens)
 
     if(word.type == TokenType::KEYWORD && keyConvert(word.lexeme) == Keywords::LT)
     {
-        bool ok;
-        double num = getNum(tokens, ok);
-        if(ok == false)
-            return false;
-        PArea->turnLeft(num);
+        if(!dealLT(tokens)) return false;
         return Parser(tokens);
     }
 
     if(word.type == TokenType::KEYWORD && keyConvert(word.lexeme) == Keywords::RT)
     {
-        bool ok;
-        double num = getNum(tokens, ok);
-        if(ok == false)
-            return false;
-        PArea->turnRight(num);
+        if(!dealRT(tokens)) return false;
         return Parser(tokens);
     }
 
     if(word.type == TokenType::KEYWORD && keyConvert(word.lexeme) == Keywords::SETW)
     {
-        bool ok;
-        double num = getNum(tokens, ok);
-        if(ok == false)
-            return false;
-        PArea->setW(num);
+        if(!dealsetW(tokens)) return false;
         return Parser(tokens);
     }
 
@@ -407,7 +434,7 @@ bool MainWindow::Parser(std::vector<Token> & tokens)
         return Parser(tokens);
     }
 
-    if(word.type == TokenType::NUMBER || (word.type == TokenType::IDENTIFIER && varNames.count(word.lexeme)))
+    if(word.type == TokenType::NUMBER || (word.type == TokenType::IDENTIFIER && varNames.count(word.lexeme)) || word.type == TokenType::LPAREN)
     {
         tokens.push_back(word);
         bool ok;
