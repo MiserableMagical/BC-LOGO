@@ -29,7 +29,7 @@ bool hasHigherPrecedence(QString op1, QString op2) {
     return precedence[op1] >= precedence[op2];
 }
 
-const qreal Epsilon = 1e-9;
+const qreal Epsilon = 1e-12;
 bool Truth(qreal val)
 {
     if(abs(val) < Epsilon) return 0;

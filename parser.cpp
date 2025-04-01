@@ -79,6 +79,9 @@ bool checkBrackets(QString &text)
     return cur == 0;
 }
 
+const qreal Epsilon = 1e-12;
+bool Truth(qreal val);
+
 /*double MainWindow::getNum(std::vector<Token> & tokens, bool &ok)
 {
     ok = true;
@@ -115,8 +118,6 @@ void MainWindow::getExpBound(std::vector<Token> & tokens,std::vector<Token> & ex
         result = -1;
         return;
     }
-    //reverse(exp.begin(),exp.end());
-    //for(auto c : exp) qDebug() << "!" << c.lexeme;
 }
 
 //计算下一个参数的数值
@@ -136,7 +137,7 @@ double MainWindow::getNum(std::vector<Token> & tokens, bool &ok)
 }
 
 
-/*以下为关键字读入处理部分*/
+/*以下为关键字读入处理部分（模块化）*/
 
 bool MainWindow::dealPrint(std::vector<Token> & tokens)
 {
@@ -194,6 +195,104 @@ bool MainWindow::dealRT(std::vector<Token> & tokens)
     return true;
 }
 
+bool MainWindow::dealRepeat(std::vector<Token> & tokens)
+{
+    bool ok;
+    double num = getNum(tokens, ok);
+    num = floor(num + 1e-12);
+    if(ok == false)
+        return false;
+
+    if(tokens.empty() || tokens.back().type != TokenType::LBRACKET) {
+        Report("Left bracket not found");
+        return false;
+    }
+    std::vector<Token> repPat;
+    tokens.pop_back();
+    int layer = 1;
+    while(!tokens.empty())
+    {
+        auto curToken = tokens.back();
+        tokens.pop_back();
+        switch(curToken.type)
+        {
+        case TokenType::LBRACKET: layer++;repPat.push_back(curToken);break;
+        case TokenType::RBRACKET: layer--;repPat.push_back(curToken);break;
+        default:
+            repPat.push_back(curToken);
+            break;
+        }
+        if(layer == 0)
+            break;
+    }
+    repPat.pop_back();
+    reverse(repPat.begin(), repPat.end());
+
+    vector<Token> repPat_2 = repPat;
+    for(int i = 1;i <= num;i++) {
+        if(!Parser(repPat)) return false;
+        repPat = repPat_2;
+    }
+    return true;
+}
+
+bool MainWindow::dealFD(vector<Token> & tokens)
+{
+    bool ok;
+    double num = getNum(tokens, ok);
+    if(ok == false)
+        return false;
+    PArea->Forward(num);
+    return true;
+}
+
+bool MainWindow::dealBK(vector<Token> & tokens)
+{
+    bool ok;
+    double num = getNum(tokens, ok);
+    if(ok == false)
+        return false;
+    PArea->Backward(num);
+    return true;
+}
+
+bool MainWindow::dealIF(vector<Token> & tokens)
+{
+    bool ok;
+    double truthValue = getNum(tokens, ok);
+    if(ok == false)
+        return false;
+    if(tokens.empty() || tokens.back().type != TokenType::LBRACKET) {
+        Report("Left bracket not found");
+        return false;
+    }
+    std::vector<Token> body;
+    tokens.pop_back();
+    int layer = 1;
+    while(!tokens.empty())
+    {
+        auto curToken = tokens.back();
+        tokens.pop_back();
+        switch(curToken.type)
+        {
+        case TokenType::LBRACKET: layer++;body.push_back(curToken);break;
+        case TokenType::RBRACKET: layer--;body.push_back(curToken);break;
+        default:
+            body.push_back(curToken);
+            break;
+        }
+        if(layer == 0)
+            break;
+    }
+    body.pop_back();
+    reverse(body.begin(), body.end());
+    if(Truth(truthValue))
+    {
+        if(!Parser(body)) return false;
+    }
+    return true;
+}
+
 /*以上为关键字读入处理部分*/
 
 bool MainWindow::Parser(std::vector<Token> & tokens)
@@ -219,8 +318,15 @@ bool MainWindow::Parser(std::vector<Token> & tokens)
         return true;
     //word = word.toUpper();
 
-    if(word.type == TokenType::KEYWORD && word.lexeme == "PRINT") {
+    if(word.type == TokenType::KEYWORD && word.lexeme == "PRINT")
+    {
         if(!dealPrint(tokens)) return false;
+        return Parser(tokens);
+    }
+
+    if(word.type == TokenType::KEYWORD && word.lexeme == "IF")
+    {
+        if(!dealIF(tokens)) return false;
         return Parser(tokens);
     }
 
@@ -310,49 +416,13 @@ bool MainWindow::Parser(std::vector<Token> & tokens)
         return true;
     }
 
-    if(word.type == TokenType::KEYWORD && keyConvert(word.lexeme) == Keywords::END) {
-
+    if(word.type == TokenType::KEYWORD && keyConvert(word.lexeme) == Keywords::END) {// the string has ended
         return true;
     }
 
     if(word.type == TokenType::KEYWORD && word.lexeme == "REPEAT")
     {
-        bool ok;
-        double num = getNum(tokens, ok);
-        num = floor(num + 1e-6);
-        if(ok == false)
-            return false;
-
-        if(tokens.empty() || tokens.back().type != TokenType::LBRACKET) {
-            Report("Left bracket not found");
-            return false;
-        }
-        std::vector<Token> repPat;
-        tokens.pop_back();
-        int layer = 1;
-        while(!tokens.empty())
-        {
-            auto curToken = tokens.back();
-            tokens.pop_back();
-            switch(curToken.type)
-            {
-            case TokenType::LBRACKET: layer++;repPat.push_back(curToken);break;
-            case TokenType::RBRACKET: layer--;repPat.push_back(curToken);break;
-            default:
-                repPat.push_back(curToken);
-                break;
-            }
-            if(layer == 0)
-                break;
-        }
-        repPat.pop_back();
-        reverse(repPat.begin(), repPat.end());
-
-        vector<Token> repPat_2 = repPat;
-        for(int i = 1;i <= num;i++) {
-            if(!Parser(repPat)) return false;
-            repPat = repPat_2;
-        }
+        if(!dealRepeat(tokens)) return false;
         return Parser(tokens);
     }
 
@@ -392,21 +462,13 @@ bool MainWindow::Parser(std::vector<Token> & tokens)
 
     if(word.type == TokenType::KEYWORD && keyConvert(word.lexeme) == Keywords::FD)
     {
-        bool ok;
-        double num = getNum(tokens, ok);
-        if(ok == false)
-            return false;
-        PArea->Forward(num);
+        if(!dealFD(tokens)) return false;
         return Parser(tokens);
     }
 
     if(word.type == TokenType::KEYWORD && keyConvert(word.lexeme) == Keywords::BK)
     {
-        bool ok;
-        double num = getNum(tokens, ok);
-        if(ok == false)
-            return false;
-        PArea->Backward(num);
+        if(!dealBK(tokens)) return false;
         return Parser(tokens);
     }
 

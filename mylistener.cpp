@@ -6,6 +6,7 @@
 
 myListener::myListener() {
     this->setFont((QFont){"Courier",12});
+    this->setWordWrapMode(QTextOption::NoWrap);
     //connect(this, &myListener::cursorPositionChanged, this, &myListener::cursorLock);
 }
 

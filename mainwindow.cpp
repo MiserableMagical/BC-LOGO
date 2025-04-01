@@ -9,7 +9,7 @@
 #include "QMessageBox"
 #include "mylistener.h"
 
-QString version = "V0.2[250321]";
+QString version = "V0.5[250331]";
 QString curText = "Beacon's Logo " + version + " for Windows x64\nWenkai Cheng\n";
 
 myListener *Lis;

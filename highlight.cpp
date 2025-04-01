@@ -16,8 +16,12 @@ MyHighlighter::MyHighlighter(QTextDocument *parent)
     commentFormat.setForeground(Qt::darkGreen);
     commentFormat.setFontItalic(true);
 
+    //数字
     numFormat.setForeground((QColor){110,60,0});//Brown
+    //括号
     brkFormat.setForeground(Qt::red);
+    //符号
+    opFormat.setForeground(Qt::darkBlue);
 
     // 定义字符串的格式
     quotationFormat.setForeground(Qt::darkRed);
@@ -53,6 +57,13 @@ MyHighlighter::MyHighlighter(QTextDocument *parent)
     brkRule.pattern.setPatternOptions(QRegularExpression::CaseInsensitiveOption);
     brkRule.format = brkFormat;
     highlightingRules.append(brkRule);
+
+    //Highlight for operators
+    HighlightingRule opRule;
+    opRule.pattern = QRegularExpression("[\\+\\-\\*\\/\\<\\>\\=]");
+    opRule.pattern.setPatternOptions(QRegularExpression::CaseInsensitiveOption);
+    opRule.format = opFormat;
+    highlightingRules.append(opRule);
 
     // 添加注释高亮规则
     /*HighlightingRule commentRule;

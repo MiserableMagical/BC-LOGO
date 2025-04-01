@@ -59,7 +59,10 @@ public:
     bool dealLT(vector<Token>&);
     bool dealRT(vector<Token>&);
     bool dealsetW(vector<Token>&);
-
+    bool dealRepeat(vector<Token>&);
+    bool dealFD(vector<Token>&);
+    bool dealBK(vector<Token>&);
+    bool dealIF(vector<Token>&);
 private:
     Ui::MainWindow *ui;
 };

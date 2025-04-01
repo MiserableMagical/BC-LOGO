@@ -32,6 +32,7 @@ private:
     QTextCharFormat commentFormat;
     QTextCharFormat quotationFormat;
     QTextCharFormat brkFormat;
+    QTextCharFormat opFormat;
 };
 
 class myListener : public QTextEdit
