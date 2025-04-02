@@ -57,3 +57,8 @@ void myListener::cursorLock()
         this->setTextCursor(cursor);
     }
 }
+
+void myListener::Clear()
+{
+    this->setText("");
+}

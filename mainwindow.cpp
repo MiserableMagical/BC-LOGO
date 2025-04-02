@@ -9,7 +9,7 @@
 #include "QMessageBox"
 #include "mylistener.h"
 
-QString version = "V0.5[250331]";
+QString version = "V0.5[250402]";
 QString curText = "Beacon's Logo " + version + " for Windows x64\nWenkai Cheng\n";
 
 myListener *Lis;
@@ -120,13 +120,13 @@ void MainWindow::apply(QString &str,bool echo)//现在echo只为false
 void MainWindow::loadFile()
 {
     QString fname = QFileDialog::getOpenFileName(this,"选择一个文件...",QString(),"LOGO Files(*.lgo)");
-    //ui->Listener->setText("777");
     QFile file(fname);
     if(!file.exists())
     {
         setListenerText("File open failed");
         return;
     }
+
     setListenerText("Loading from " + fname);
     file.open(QIODevice::ReadOnly | QIODevice::Text);
     QByteArray allLines = file.readAll();
@@ -244,7 +244,8 @@ MainWindow::MainWindow(QWidget *parent)
     connect(ui->actionNew,&QAction::triggered,this,&MainWindow::launchEditor);
     connect(ui->actionSave,&QAction::triggered,this,&MainWindow::onSaveasFile);
     connect(ui->actionLoad,&QAction::triggered,this,&MainWindow::loadFile);
-
+    connect(ui->actionClear,&QAction::triggered,Lis,&myListener::Clear);
+    connect(ui->actionSelectAll,&QAction::triggered,Lis,&myListener::selectAll);
     //connect(ui->lineEdit,&QLineEdit::editingFinished,this,&MainWindow::modifyText);
 
     //connect(ui->textEdit,&QTextEdit::);

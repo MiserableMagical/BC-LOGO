@@ -17,6 +17,7 @@ std::unordered_map<QString, int> precedence = {
     {"-", 101},
     {"*", 102},
     {"/", 102},
+    {"%", 102}
 };
 
 // 判断字符是否为运算符
@@ -117,6 +118,11 @@ qreal MainWindow::eval(vector<Token> &expr, bool &isValid)
                 results.push(fir * sec);
             if(cur == "/")
                 results.push(fir / sec);
+            if(cur == "%")
+            {
+                if((long long)sec == 0) results.push(0.0 / 0.0);
+                else results.push((long long)fir % (long long)sec);
+            }
             if(cur == "&")
                 results.push(Truth(fir) && Truth(sec));
             if(cur == "|")

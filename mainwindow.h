@@ -63,6 +63,10 @@ public:
     bool dealFD(vector<Token>&);
     bool dealBK(vector<Token>&);
     bool dealIF(vector<Token>&);
+    bool dealTO(vector<Token>&);
+    bool dealIFELSE(vector<Token>&);
+    bool dealMake(vector<Token>&);
+    bool dealWhile(vector<Token>&);
 private:
     Ui::MainWindow *ui;
 };

@@ -19,7 +19,8 @@ SOURCES += \
     mainwindow.cpp \
     mylistener.cpp \
     parser.cpp \
-    single.cpp
+    parser_single.cpp \
+    singlestep.cpp
 
 HEADERS += \
     _cursor.h \

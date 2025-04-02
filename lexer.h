@@ -42,6 +42,8 @@ enum class Keywords {
     PRINT,
     SETPC,
     IF,
+    IFELSE,
+    WHILE,
     PLACEHOLDER
 };
 
@@ -64,6 +66,7 @@ class Lexer {
     int column_;
 
     QChar currentChar() const;
+    //QChar nextChar() const;
     bool isalnum(QChar);
     void advance();
     void skipWhitespace();

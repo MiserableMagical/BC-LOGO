@@ -41,6 +41,7 @@ class myListener : public QTextEdit
 public:
     myListener();
     void register_key_enter_handler(MainWindow* pWindow);
+    void Clear();
 protected:
     void keyReleaseEvent(QKeyEvent *e) override;
     void cursorLock();

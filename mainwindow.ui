@@ -65,7 +65,7 @@
    </property>
    <widget class="QMenu" name="menuFile">
     <property name="title">
-     <string>File</string>
+     <string>文件</string>
     </property>
     <addaction name="actionNew"/>
     <addaction name="actionOpen"/>
@@ -74,8 +74,10 @@
    </widget>
    <widget class="QMenu" name="menuEdit">
     <property name="title">
-     <string>Edit</string>
+     <string>编辑</string>
     </property>
+    <addaction name="actionClear"/>
+    <addaction name="actionSelectAll"/>
    </widget>
    <addaction name="menuFile"/>
    <addaction name="menuEdit"/>
@@ -83,22 +85,32 @@
   <widget class="QStatusBar" name="statusbar"/>
   <action name="actionOpen">
    <property name="text">
-    <string>Open</string>
+    <string>打开文件</string>
    </property>
   </action>
   <action name="actionLoad">
    <property name="text">
-    <string>Load</string>
+    <string>加载文件</string>
    </property>
   </action>
   <action name="actionSave">
    <property name="text">
-    <string>Save</string>
+    <string>保存</string>
    </property>
   </action>
   <action name="actionNew">
    <property name="text">
-    <string>New</string>
+    <string>新建文件</string>
+   </property>
+  </action>
+  <action name="actionClear">
+   <property name="text">
+    <string>清空</string>
+   </property>
+  </action>
+  <action name="actionSelectAll">
+   <property name="text">
+    <string>全选</string>
    </property>
   </action>
  </widget>

@@ -105,6 +105,7 @@ Token Lexer::nextToken() {
         int start_col = column_;
         QString charStr(1, c);
         advance();
+        QChar nxt = currentChar();
 
         switch (c.toLatin1()) {
         case '(': return Token(TokenType::LPAREN, charStr, 0, start_line, start_col);
@@ -113,7 +114,14 @@ Token Lexer::nextToken() {
         case ']': return Token(TokenType::RBRACKET, charStr, 0, start_line, start_col);
         case ',': return Token(TokenType::COMMA, charStr, 0, start_line, start_col);
         case ';': return Token(TokenType::SEMICOLON, charStr, 0, start_line, start_col);
-        case '+': case '-': case '*': case '/': case '>': case '<': case '=':
+        case '+': case '-': case '*': case '/': case '=': case '%' :
+            return Token(TokenType::OPERATOR, charStr, 0, start_line, start_col);
+        case '>': case '<':
+            if(nxt == '=')
+            {
+                advance();
+                return Token(TokenType::OPERATOR, charStr + nxt, 0, start_line, start_col);
+            }
             return Token(TokenType::OPERATOR, charStr, 0, start_line, start_col);
         default:
             return Token(TokenType::INVALID, charStr, 0, start_line, start_col);

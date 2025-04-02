@@ -18,7 +18,7 @@ void editor::updTitle()
 editor :: editor(){
 
     QToolBar * toolbar = new QToolBar(this);
-    QAction *file_save = new QAction("Save", this);
+    QAction *file_save = new QAction("保存", this);
 
     toolbar->addAction(file_save);
     //QAction *file_save = new QAction("保存", this);
