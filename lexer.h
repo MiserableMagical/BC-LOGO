@@ -44,6 +44,10 @@ enum class Keywords {
     IF,
     IFELSE,
     WHILE,
+    SETX,
+    SETY,
+    SETXY,
+    SETPCDEC,
     PLACEHOLDER
 };
 

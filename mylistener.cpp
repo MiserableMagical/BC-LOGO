@@ -27,6 +27,7 @@ void myListener::keyReleaseEvent(QKeyEvent* e)//回车
             totLines++;
 
             QTextCursor cursor = this->textCursor();
+            //移到最后一行的开头
             cursor.movePosition(QTextCursor::End);
             cursor.movePosition(QTextCursor::StartOfLine, QTextCursor::KeepAnchor);
             //试图将光标后的内容移回原位

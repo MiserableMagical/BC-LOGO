@@ -32,9 +32,7 @@ public:
         QTransform transform;
         transform.rotate(deg);
         double val = std::max(abs(sin(deg / 180.0 * PI)), abs(cos(deg / 180.0 * PI)));
-        int nw_Size = int(baseSize / val);
-        //if(val < 0.88) nw_Size = 12;//adjusted size
-        //else nw_Size = 10;
+        int nw_Size = int(baseSize / val);//修正图片大小
         Size = nw_Size;
         return img.transformed(transform);
     }

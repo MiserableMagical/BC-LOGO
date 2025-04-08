@@ -25,7 +25,7 @@ bool checkBrackets(QString &text)
     return cur == 0;
 }
 
-const qreal Epsilon = 1e-12;
+const qreal Epsilon = 1e-11;
 bool Truth(qreal val);
 
 /*double MainWindow::getNum(std::vector<Token> & tokens, bool &ok)
@@ -77,9 +77,33 @@ double MainWindow::getNum(std::vector<Token> & tokens, bool &ok)
         ok = false;
         return 0;
     }
-    double res = eval(exp, ok);
-    if(ok) return res;
+    vector<qreal> res = eval(exp, ok);
+    if(ok) return res.front();
     return 0;
+}
+
+//一次性获取多个参数的值
+vector<qreal> MainWindow::getNums(std::vector<Token>& tokens, bool& ok, int cap)
+{
+    ok = true;
+    std::vector<Token> exp;
+    int state = 0;
+    getExpBound(tokens, exp, state);
+    if(state == -1) {
+        ok = false;
+        return {};
+    }
+    vector<qreal> res = eval(exp, ok);
+    if(ok) {
+        if(res.size() < cap)
+        {
+            Report("This procedure needs more input(s)");
+            ok = false;
+            return {};
+        }
+        return res;
+    }
+    return {};
 }
 
 
@@ -111,6 +135,18 @@ bool MainWindow::dealsetPC(std::vector<Token> & tokens)
     return true;
 }
 
+bool MainWindow::dealsetPCdec(std::vector<Token> & tokens)
+{
+    bool ok;
+    vector<qreal> res = getNums(tokens, ok, 3);
+    if(ok == false)
+        return false;
+
+    QColor color((int)res[0], (int)res[1], (int)res[2]);
+    PArea->setPC(color);
+    return true;
+}
+
 bool MainWindow::dealsetW(std::vector<Token> & tokens)
 {
     bool ok;
@@ -118,6 +154,36 @@ bool MainWindow::dealsetW(std::vector<Token> & tokens)
     if(ok == false)
         return false;
     PArea->setW(num);
+    return true;
+}
+
+bool MainWindow::dealsetX(std::vector<Token> & tokens)
+{
+    bool ok;
+    double num = getNum(tokens, ok);
+    if(ok == false)
+        return false;
+    PArea->setX(num);
+    return true;
+}
+
+bool MainWindow::dealsetY(std::vector<Token> & tokens)
+{
+    bool ok;
+    double num = getNum(tokens, ok);
+    if(ok == false)
+        return false;
+    PArea->setY(num);
+    return true;
+}
+
+bool MainWindow::dealsetXY(std::vector<Token> & tokens)
+{
+    bool ok;
+    vector<qreal> res = getNums(tokens, ok, 2);
+    if(ok == false)
+        return false;
+    PArea->setXY(res[0], res[1]);
     return true;
 }
 
@@ -341,12 +407,14 @@ bool MainWindow::dealTO(vector<Token> & tokens)
     if(!reDef)
     {
         Procs.push_back(QStringList());
-        ProcTokens.push_back(vector<vector<Token>>());
+        ProcTokens.push_back(vector<Token>());
+        //ProcTokens.push_back(vector<vector<Token>>());
     }
     else
     {
         Procs[reg_id - 1] = QStringList();
-        ProcTokens[reg_id - 1] = vector<vector<Token>>();
+        ProcTokens[reg_id - 1] = vector<Token>();
+        //ProcTokens[reg_id - 1] = vector<vector<Token>>();
     }
     Defmode = true;
     Def_name = name;
@@ -358,14 +426,14 @@ bool MainWindow::dealMake(vector<Token> & tokens)
 {
     if(tokens.empty())
     {
-        Report("This procedure(TO) needs more input(s)");
+        Report("This procedure(MAKE) needs more input(s)");
         return false;
     }
     Token nextToken = tokens.back();
     tokens.pop_back();
     if(!(nextToken.type == TokenType::KEYWORD || nextToken.type == TokenType::IDENTIFIER))
     {
-        Report("This procedure(TO) needs more input(s)");
+        Report("This procedure(MAKE) needs more input(s)");
         return false;
     }
     QString name = nextToken.lexeme;
@@ -380,7 +448,7 @@ bool MainWindow::dealMake(vector<Token> & tokens)
     double num = getNum(tokens, ok);
     if(ok == false)
         return false;
-    //qDebug() << name << ' ' << num;
+
     varNames[name] = num;
     return true;
 }
@@ -427,9 +495,9 @@ bool MainWindow::dealWhile(std::vector<Token> & tokens)
     int repNum = 0;
     while(true) {
         ok = true;
-        double res = eval(exp, ok);
-        if(ok == false) return false;
-        if(!Truth(res)) break;
+        vector<qreal> res = eval(exp, ok);
+        if(ok == false || res.empty()) return false;
+        if(!Truth(res[0])) break;
         if(!Parser(repPat)) return false;
         repPat = repPat_2;
         repNum++;

@@ -27,7 +27,7 @@ class MainWindow : public QMainWindow
     map<QString, int> ProcNames;
     map<QString, qreal> varNames;
     vector<QStringList> Procs;
-    vector<vector<vector<Token>>> ProcTokens;
+    vector<vector<Token>> ProcTokens;
 public:
     QString cmd_buf;
     bool Defmode = false;
@@ -45,20 +45,26 @@ public:
     void initPArea();
     void initListener();
 
+
+private:
     //parser
     void singleStepParser(QString text);
+    bool checkType(QString &);
     bool Parser(std::vector<Token> &);
     double getNum(std::vector<Token>&, bool&);
+    vector<qreal> getNums(std::vector<Token>&, bool&, int);
     void Tokenize(QString &,std::vector<Token> &);
     void getExpBound(std::vector<Token>&,std::vector<Token>&,int&);
-    qreal eval(vector<Token>&,bool &isValid);
-
+    vector<qreal> eval(vector<Token>&,bool &isValid);
     //separate functions
     bool dealPrint(vector<Token>&);
     bool dealsetPC(vector<Token>&);
     bool dealLT(vector<Token>&);
     bool dealRT(vector<Token>&);
     bool dealsetW(vector<Token>&);
+    bool dealsetX(vector<Token>&);
+    bool dealsetY(vector<Token>&);
+    bool dealsetXY(vector<Token>&);
     bool dealRepeat(vector<Token>&);
     bool dealFD(vector<Token>&);
     bool dealBK(vector<Token>&);
@@ -67,7 +73,7 @@ public:
     bool dealIFELSE(vector<Token>&);
     bool dealMake(vector<Token>&);
     bool dealWhile(vector<Token>&);
-private:
+    bool dealsetPCdec(vector<Token>&);
     Ui::MainWindow *ui;
 };
 #endif // MAINWINDOW_H

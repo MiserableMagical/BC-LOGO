@@ -49,7 +49,11 @@ map<QString, Keywords> defaultNames = {
     {"OR",Keywords::PLACEHOLDER},
     {"IF",Keywords::IF},
     {"IFELSE",Keywords::IFELSE},
-    {"WHILE",Keywords::WHILE}
+    {"WHILE",Keywords::WHILE},
+    {"SETPCDEC",Keywords::SETPCDEC},
+    {"SETX",Keywords::SETX},
+    {"SETY",Keywords::SETY},
+    {"SETXY",Keywords::SETXY}
 };
 
 Keywords keyConvert(QString name) {
@@ -218,6 +222,30 @@ bool MainWindow::Parser(std::vector<Token> & tokens)
         return Parser(tokens);
     }
 
+    if(word.type == TokenType::KEYWORD && keyConvert(word.lexeme) == Keywords::SETPCDEC)
+    {
+        if(!dealsetPCdec(tokens)) return false;
+        return Parser(tokens);
+    }
+
+    if(word.type == TokenType::KEYWORD && keyConvert(word.lexeme) == Keywords::SETX)
+    {
+        if(!dealsetX(tokens)) return false;
+        return Parser(tokens);
+    }
+
+    if(word.type == TokenType::KEYWORD && keyConvert(word.lexeme) == Keywords::SETY)
+    {
+        if(!dealsetY(tokens)) return false;
+        return Parser(tokens);
+    }
+
+    if(word.type == TokenType::KEYWORD && keyConvert(word.lexeme) == Keywords::SETXY)
+    {
+        if(!dealsetXY(tokens)) return false;
+        return Parser(tokens);
+    }
+
     if(word.type == TokenType::NUMBER || (word.type == TokenType::IDENTIFIER && varNames.count(word.lexeme)) || word.type == TokenType::LPAREN)
     {
         tokens.push_back(word);
@@ -236,13 +264,14 @@ bool MainWindow::Parser(std::vector<Token> & tokens)
     {
         rec_layers++;
         int id = ProcNames[word.lexeme];
+        id--;
+        qDebug() << "?";
+        qDebug() << ProcTokens[id].size();
+        for(auto &x : ProcTokens[id]) qDebug() << x.lexeme << ' '<<(int)x.type;
 
-        for(int i = 0;i < ProcTokens[id - 1].size();i++)
-        {
-            vector<Token> temp = ProcTokens[id - 1][i];
-            if(!Parser(temp))
-                return false;
-        }
+        vector<Token> temp = ProcTokens[id];
+        if(!Parser(temp))
+            return false;
         rec_layers--;
         return Parser(tokens);
     }

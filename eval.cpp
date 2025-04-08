@@ -30,14 +30,14 @@ bool hasHigherPrecedence(QString op1, QString op2) {
     return precedence[op1] >= precedence[op2];
 }
 
-const qreal Epsilon = 1e-12;
+const qreal Epsilon = 1e-11;
 bool Truth(qreal val)
 {
     if(abs(val) < Epsilon) return 0;
     return 1;
 }
 
-qreal MainWindow::eval(vector<Token> &expr, bool &isValid)
+vector<qreal> MainWindow::eval(vector<Token> &expr, bool &isValid)
 {
     isValid = true;
     std::stack<QString> stack;
@@ -67,7 +67,7 @@ qreal MainWindow::eval(vector<Token> &expr, bool &isValid)
                 {
                     setListenerText("Invalid Expression : parentheses don't match");
                     isValid = false;
-                    return 0;
+                    return {};
                 }
                 stack.pop();
             }
@@ -80,7 +80,7 @@ qreal MainWindow::eval(vector<Token> &expr, bool &isValid)
             }
             else {
                 isValid = false;
-                return 0;
+                return {};
             }
         }
     }
@@ -98,13 +98,20 @@ qreal MainWindow::eval(vector<Token> &expr, bool &isValid)
     std::stack<qreal> results;
     for(QString &cur : post)
     {
-        if(precedence.count(cur[0]) /*cur == "+" || cur == "-" || cur == "*" || cur == "/"*/)
+        if(precedence.count(cur[0]) && (cur.size() == 1 || !cur[1].isDigit()) /*cur == "+" || cur == "-" || cur == "*" || cur == "/"*/)
         {
+            if(results.size() == 1 && cur == "-") //按负号处理
+            {
+                qreal fir = results.top();
+                results.pop();
+                results.push(-fir);
+                continue;
+            }
             if(results.size() < 2)
             {
-                setListenerText("Invalid Expression : missing parameters");
+                setListenerText("Invalid Expression");
                 isValid = false;
-                return 0;
+                return {};
             }
             qreal sec = results.top();
             results.pop();
@@ -144,5 +151,12 @@ qreal MainWindow::eval(vector<Token> &expr, bool &isValid)
         }
     }
 
-    return results.top();
+    vector<qreal> retVal;
+    while(!results.empty())
+    {
+        retVal.push_back(results.top());
+        results.pop();
+    }
+    reverse(retVal.begin(), retVal.end());
+    return retVal;
 }

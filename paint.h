@@ -13,6 +13,7 @@
 #include "qmainwindow.h"
 #endif // PAINT_H
 
+//QFrame_是画图区域本身，用于处理图形绘制
 class QFrame_ : public QFrame{
     /*public : QPainterPath path;
     public : void paintEvent(QPaintEvent * event)
@@ -58,7 +59,6 @@ public : QPixmap *pixmap = new QPixmap(900, 400);
         path.moveTo(x,y);
         path.lineTo(x1,y1);
         painter.drawPath(path);
-        //painter.drawLine(x,y,x1,y1);
         x = x1;y = y1;
     }
     void moveTo(double x1,double y1)
@@ -72,6 +72,7 @@ public : QPixmap *pixmap = new QPixmap(900, 400);
     }
 };
 
+//PaintArea集成了画图区域和光标，处理较复杂的操作
 class PaintArea{
     _Cursor cursor;
     QFrame_ *frame;
@@ -96,6 +97,7 @@ class PaintArea{
         frame->resize(900,400);
         frame->pixmap->fill(Qt::transparent);
         frame->raise();
+        frame->x = frame->y = 0;
         cursor.img = new QLabel;
         cursor.img->setParent(pa);
         cursor.img->setPixmap(QPixmap(":/new/cursor/CURSOR.jpg"));
@@ -110,6 +112,9 @@ class PaintArea{
     void turnRight(double deg);
     void setW(int width);
     void setPC(QColor);
+    void setX(qreal);
+    void setY(qreal);
+    void setXY(qreal,qreal);
     void clearScreen();
     void showTurtle();
     void hideTurtle();

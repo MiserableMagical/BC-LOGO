@@ -9,7 +9,7 @@
 #include "QMessageBox"
 #include "mylistener.h"
 
-QString version = "V0.5[250402]";
+QString version = "V0.5[250408]";
 QString curText = "Beacon's Logo " + version + " for Windows x64\nWenkai Cheng\n";
 
 myListener *Lis;
@@ -38,7 +38,7 @@ void MainWindow::setListenerText(QString str)
 }*/
 
 
-void MainWindow::modifyText()//执行命令，作用同apply
+void MainWindow::modifyText()//执行缓冲区的命令
 {
     QString curstr = cmd_buf.trimmed();
     apply(curstr, 0);
@@ -98,7 +98,9 @@ void MainWindow::apply(QString &str,bool echo)//现在echo只为false
     else
     {
         str = str.trimmed();
-        if(!str.isEmpty() && (str.section(' ',0,0)).toUpper() == "END")
+        vector<Token> curstr;
+        Tokenize(str, curstr);
+        /*if(!str.isEmpty() && (str.section(' ',0,0)).toUpper() == "END")
         {
             Defmode = false;
             ui->DefHint->hide();
@@ -107,16 +109,45 @@ void MainWindow::apply(QString &str,bool echo)//现在echo只为false
             return;
         }
         if(echo)
-            setListenerText("> " + str);
+            setListenerText("> " + str);*/
+
         Procs[Def_id].append(str);
-        vector<Token> curstr;
-        Tokenize(str, curstr);
-        reverse(curstr.begin(),curstr.end());
-        ProcTokens[Def_id].push_back(curstr);
+
+        vector<Token> added;
+        for(auto &curToken : curstr)
+        {
+            if(curToken.lexeme == "END")//End of definition
+            {
+                Defmode = false;
+                ui->DefHint->hide();
+                if(!reDef) setListenerText(Def_name + " defined.");
+                else setListenerText(Def_name + " redefined.");
+                break;
+            }
+            if(curToken.type == TokenType::END_OF_INPUT) continue;
+            added.push_back(curToken);
+        }
+
+        reverse(added.begin(),added.end());
+        for(auto &curToken : added)
+            ProcTokens[Def_id].push_back(curToken);
+        //ProcTokens[Def_id].push_back(curstr);
     }
 }
 
+bool MainWindow::checkType(QString & str)//检查是否为定义语句
+{
+    vector<Token> tokens;
+    Tokenize(str, tokens);
+    for(auto &token : tokens) {
+        if(token.type == TokenType::KEYWORD && token.lexeme == "TO")
+            return true;
+    }
+    return false;
+}
+
 //加载过程
+//将过程压缩成一行（除含 TO 的行）
 void MainWindow::loadFile()
 {
     QString fname = QFileDialog::getOpenFileName(this,"选择一个文件...",QString(),"LOGO Files(*.lgo)");
@@ -132,10 +163,35 @@ void MainWindow::loadFile()
     QByteArray allLines = file.readAll();
     QString text(allLines);
     QStringList strs = text.split('\n');
+    //开始压缩
+    QString curText;
+    bool lastType = false;
+    for(int i = 0;i < strs.size();i++)
+    {
+        bool thisType = checkType(strs[i]);
+        if(thisType || lastType) {
+            qDebug() << curText;
+            apply(curText);
+            curText = QString();
+        }
+        curText += strs[i] + " ";
+        lastType = thisType;
+        //apply(strs[i], false);
+    }
+    if(!curText.isEmpty())
+    {
+        qDebug() << curText;
+        apply(curText);
+        curText = QString();
+    }
+    /*
     for(int i = 0;i < strs.size();i++)
     {
         apply(strs[i], false);
-    }
+    }*/
+    //text.replace("\n"," ");
+    //text.replace("\r"," ");
+    //apply(text, false);
 }
 
 //save all procedures

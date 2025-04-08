@@ -65,6 +65,34 @@ void PaintArea::setPC(QColor col){
     frame->penc = col;
 }
 
+void PaintArea::setX(qreal x)
+{
+    qreal &cx = cursor.X, &cy = cursor.Y;
+    frame->Line(x, cy);
+    cx = x;
+    sync();
+    frame->repaint();
+}
+
+void PaintArea::setY(qreal y)
+{
+    qreal &cx = cursor.X, &cy = cursor.Y;
+    frame->Line(cx, y);
+    cy = y;
+    sync();
+    frame->repaint();
+}
+
+void PaintArea::setXY(qreal x,qreal y)
+{
+    qreal &cx = cursor.X, &cy = cursor.Y;
+    frame->Line(x, y);
+    cx = x;
+    cy = y;
+    sync();
+    frame->repaint();
+}
+
 //处理前进操作与边界问题
 void PaintArea::Forward(double dis){
     auto vec = cursor.Vector(dis);
