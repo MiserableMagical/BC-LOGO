@@ -122,13 +122,13 @@ void MainWindow::apply(QString &str,bool echo)//现在echo只为false
                 ui->DefHint->hide();
                 if(!reDef) setListenerText(Def_name + " defined.");
                 else setListenerText(Def_name + " redefined.");
+                reverse(ProcTokens[Def_id].begin(), ProcTokens[Def_id].end());
                 break;
             }
             if(curToken.type == TokenType::END_OF_INPUT) continue;
             added.push_back(curToken);
         }
 
-        reverse(added.begin(),added.end());
         for(auto &curToken : added)
             ProcTokens[Def_id].push_back(curToken);
         //ProcTokens[Def_id].push_back(curstr);

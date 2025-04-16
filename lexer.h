@@ -48,6 +48,7 @@ enum class Keywords {
     SETY,
     SETXY,
     SETPCDEC,
+    LOCALMAKE,
     PLACEHOLDER
 };
 

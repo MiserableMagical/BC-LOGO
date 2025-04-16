@@ -49,9 +49,9 @@ vector<qreal> MainWindow::eval(vector<Token> &expr, bool &isValid)
         {
             post.push_back(c.lexeme);
         }
-        else if(c.type == TokenType::IDENTIFIER && varNames.count(c.lexeme))
+        else if(c.type == TokenType::IDENTIFIER && isVariable(c.lexeme))
         {
-            post.push_back(QString::number(varNames[c.lexeme]));
+            post.push_back(QString::number(getVariable(c.lexeme)));
         }
         else
         {
@@ -158,5 +158,7 @@ vector<qreal> MainWindow::eval(vector<Token> &expr, bool &isValid)
         results.pop();
     }
     reverse(retVal.begin(), retVal.end());
+    if(retVal.empty())
+        isValid = false;
     return retVal;
 }

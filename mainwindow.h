@@ -15,6 +15,8 @@ using std::set;
 using std::map;
 using std::vector;
 
+const int maxRecursions = 300;
+
 class MainWindow : public QMainWindow
 {
     Q_OBJECT
@@ -25,7 +27,8 @@ class MainWindow : public QMainWindow
     int Def_id = -1;
 
     map<QString, int> ProcNames;
-    map<QString, qreal> varNames;
+    map<QString, qreal> varNames[maxRecursions + 5];
+    map<QString, int> varLayer;
     vector<QStringList> Procs;
     vector<vector<Token>> ProcTokens;
 public:
@@ -56,6 +59,8 @@ private:
     void Tokenize(QString &,std::vector<Token> &);
     void getExpBound(std::vector<Token>&,std::vector<Token>&,int&);
     vector<qreal> eval(vector<Token>&,bool &isValid);
+    bool isVariable(QString);
+    qreal getVariable(QString);
     //separate functions
     bool dealPrint(vector<Token>&);
     bool dealsetPC(vector<Token>&);
@@ -72,6 +77,7 @@ private:
     bool dealTO(vector<Token>&);
     bool dealIFELSE(vector<Token>&);
     bool dealMake(vector<Token>&);
+    bool dealLocalMake(vector<Token>&);
     bool dealWhile(vector<Token>&);
     bool dealsetPCdec(vector<Token>&);
     Ui::MainWindow *ui;

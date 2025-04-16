@@ -54,7 +54,7 @@ void MainWindow::getExpBound(std::vector<Token> & tokens,std::vector<Token> & ex
     {
         nonEmpty = true;
         if(tokens.back().type == TokenType::IDENTIFIER) {// check if it's a variable
-            if(!varNames.count(tokens.back().lexeme)) break;
+            if(!isVariable(tokens.back().lexeme)) break;
         }
         exp.push_back(tokens.back());
         tokens.pop_back();
@@ -391,7 +391,7 @@ bool MainWindow::dealTO(vector<Token> & tokens)
     }
     QString name = nextToken.lexeme;
     name = name.toUpper();
-    if(defaultNames.count(name) || varNames.count(name))
+    if(defaultNames.count(name) || isVariable(name))
     {
         Report(name + " is already in use.Try a different name.");
         return false;
@@ -449,7 +449,42 @@ bool MainWindow::dealMake(vector<Token> & tokens)
     if(ok == false)
         return false;
 
-    varNames[name] = num;
+    varNames[0][name] = num;
+    if(!varLayer.count(name)) varLayer[name] = 0;
+    return true;
+}
+
+bool MainWindow::dealLocalMake(vector<Token> & tokens)
+{
+    if(tokens.empty())
+    {
+        Report("This procedure(MAKE) needs more input(s)");
+        return false;
+    }
+    Token nextToken = tokens.back();
+    tokens.pop_back();
+    if(!(nextToken.type == TokenType::KEYWORD || nextToken.type == TokenType::IDENTIFIER))
+    {
+        Report("This procedure(MAKE) needs more input(s)");
+        return false;
+    }
+
+    QString name = nextToken.lexeme;
+    name = name.toUpper();
+    if(defaultNames.count(name) || ProcNames.count(name))
+    {
+        Report(name + " is already in use.Try a different name.");
+        return false;
+    }
+
+    bool ok;
+    double num = getNum(tokens, ok);
+    if(ok == false)
+        return false;
+
+    varNames[rec_layers][name] = num;
+    varLayer[name] = rec_layers;
+    qDebug() << "!!!";
     return true;
 }
 

@@ -53,7 +53,8 @@ map<QString, Keywords> defaultNames = {
     {"SETPCDEC",Keywords::SETPCDEC},
     {"SETX",Keywords::SETX},
     {"SETY",Keywords::SETY},
-    {"SETXY",Keywords::SETXY}
+    {"SETXY",Keywords::SETXY},
+    {"LOCALMAKE",Keywords::LOCALMAKE}
 };
 
 Keywords keyConvert(QString name) {
@@ -73,12 +74,24 @@ void Wait(int milis)
     }
 }
 
+bool MainWindow::isVariable(QString name)
+{
+    return varLayer.count(name);
+}
+
+qreal MainWindow::getVariable(QString name)
+{
+    if(!isVariable(name)) return 0;
+    int lay = varLayer[name];
+    return varNames[lay][name];
+}
+
 bool MainWindow::Parser(std::vector<Token> & tokens)
 {
 
     if(tokens.size() == 0)
         return true;
-    if(rec_layers > 100)
+    if(rec_layers > maxRecursions)
     {
         Report("Too many recursive calls");
         return false;
@@ -120,9 +133,15 @@ bool MainWindow::Parser(std::vector<Token> & tokens)
         return Parser(tokens);
     }
 
-    if(word.type == TokenType::KEYWORD && word.lexeme == "MAKE")
+    if(word.type == TokenType::KEYWORD && keyConvert(word.lexeme) == Keywords::MAKE)
     {
         if(!dealMake(tokens)) return false;
+        return Parser(tokens);
+    }
+
+    if(word.type == TokenType::KEYWORD && keyConvert(word.lexeme) == Keywords::LOCALMAKE)
+    {
+        if(!dealLocalMake(tokens)) return false;
         return Parser(tokens);
     }
 
@@ -146,7 +165,7 @@ bool MainWindow::Parser(std::vector<Token> & tokens)
         return true;
     }
 
-    if(word.type == TokenType::KEYWORD && word.lexeme == "REPEAT")
+    if(word.type == TokenType::KEYWORD && keyConvert(word.lexeme) == Keywords::REPEAT)
     {
         if(!dealRepeat(tokens)) return false;
         return Parser(tokens);
@@ -246,7 +265,7 @@ bool MainWindow::Parser(std::vector<Token> & tokens)
         return Parser(tokens);
     }
 
-    if(word.type == TokenType::NUMBER || (word.type == TokenType::IDENTIFIER && varNames.count(word.lexeme)) || word.type == TokenType::LPAREN)
+    if(word.type == TokenType::NUMBER || (word.type == TokenType::IDENTIFIER && isVariable(word.lexeme)) || word.type == TokenType::LPAREN)
     {
         tokens.push_back(word);
         bool ok;
@@ -262,7 +281,6 @@ bool MainWindow::Parser(std::vector<Token> & tokens)
 
     if(ProcNames.count(word.lexeme))//a process(without parameters)
     {
-        rec_layers++;
         int id = ProcNames[word.lexeme];
         id--;
         qDebug() << "?";
@@ -270,9 +288,13 @@ bool MainWindow::Parser(std::vector<Token> & tokens)
         for(auto &x : ProcTokens[id]) qDebug() << x.lexeme << ' '<<(int)x.type;
 
         vector<Token> temp = ProcTokens[id];
+        map<QString, int> varLayer_old = varLayer;
+        rec_layers++;
         if(!Parser(temp))
             return false;
+        varNames[rec_layers].clear();
         rec_layers--;
+        varLayer = varLayer_old;
         return Parser(tokens);
     }
 
