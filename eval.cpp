@@ -5,6 +5,9 @@
 #include "mainwindow.h"
 #include <stack>
 
+#define Report setListenerText
+#define RegExp QRegularExpression
+
 std::unordered_map<QString, int> precedence = {
     {"=",1},
     {">",2},
@@ -158,7 +161,73 @@ vector<qreal> MainWindow::eval(vector<Token> &expr, bool &isValid)
         results.pop();
     }
     reverse(retVal.begin(), retVal.end());
-    if(retVal.empty())
-        isValid = false;
     return retVal;
+}
+
+
+//找到该表达式的范围
+void MainWindow::getExpBound(std::vector<Token> & tokens,std::vector<Token> & exp,int &result)
+{
+
+    //bool nonEmpty = false;
+    while(!tokens.empty() && ((tokens.back().type == TokenType::NUMBER
+                                || tokens.back().type == TokenType::LPAREN
+                                || tokens.back().type == TokenType::RPAREN
+                                || tokens.back().type == TokenType::OPERATOR
+                                || tokens.back().type == TokenType::IDENTIFIER)))
+    {
+        //nonEmpty = true;
+        if(tokens.back().type == TokenType::IDENTIFIER) {// check if it's a variable
+            if(!isVariable(tokens.back().lexeme)) break;
+        }
+        exp.push_back(tokens.back());
+        tokens.pop_back();
+    }
+}
+
+//计算下一个参数的数值
+double MainWindow::getNum(std::vector<Token> & tokens, bool &ok)
+{
+    ok = true;
+    std::vector<Token> exp;
+    int state = 0;
+    getExpBound(tokens, exp, state);
+    if(state == -1) {
+        ok = false;
+        return 0;
+    }
+    vector<qreal> res = eval(exp, ok);
+    if(ok) {
+        if(res.empty())
+        {
+            ok = false;
+            return 0;
+        }
+        return res.front();
+    }
+    return 0;
+}
+
+//一次性获取多个参数的值
+vector<qreal> MainWindow::getNums(std::vector<Token>& tokens, bool& ok, int cap)
+{
+    ok = true;
+    std::vector<Token> exp;
+    int state = 0;
+    getExpBound(tokens, exp, state);
+    if(state == -1) {
+        ok = false;
+        return {};
+    }
+    vector<qreal> res = eval(exp, ok);
+    if(ok) {
+        if(res.size() < cap)
+        {
+            Report("This procedure needs more input(s)");
+            ok = false;
+            return {};
+        }
+        return res;
+    }
+    return {};
 }

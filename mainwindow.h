@@ -27,6 +27,7 @@ class MainWindow : public QMainWindow
     int Def_id = -1;
 
     map<QString, int> ProcNames;
+    vector<vector<QString>> Args;
     map<QString, qreal> varNames[maxRecursions + 5];
     map<QString, int> varLayer;
     vector<QStringList> Procs;

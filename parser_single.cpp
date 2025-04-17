@@ -41,72 +41,6 @@ bool Truth(qreal val);
     return res;
 }*/
 
-//找到该表达式的范围
-void MainWindow::getExpBound(std::vector<Token> & tokens,std::vector<Token> & exp,int &result)
-{
-
-    bool nonEmpty = false;
-    while(!tokens.empty() && ((tokens.back().type == TokenType::NUMBER
-                                || tokens.back().type == TokenType::LPAREN
-                                || tokens.back().type == TokenType::RPAREN
-                                || tokens.back().type == TokenType::OPERATOR
-                                || tokens.back().type == TokenType::IDENTIFIER)))
-    {
-        nonEmpty = true;
-        if(tokens.back().type == TokenType::IDENTIFIER) {// check if it's a variable
-            if(!isVariable(tokens.back().lexeme)) break;
-        }
-        exp.push_back(tokens.back());
-        tokens.pop_back();
-    }
-    if(nonEmpty == false) {
-        Report("This procedure needs more input(s)");
-        result = -1;
-        return;
-    }
-}
-
-//计算下一个参数的数值
-double MainWindow::getNum(std::vector<Token> & tokens, bool &ok)
-{
-    ok = true;
-    std::vector<Token> exp;
-    int state = 0;
-    getExpBound(tokens, exp, state);
-    if(state == -1) {
-        ok = false;
-        return 0;
-    }
-    vector<qreal> res = eval(exp, ok);
-    if(ok) return res.front();
-    return 0;
-}
-
-//一次性获取多个参数的值
-vector<qreal> MainWindow::getNums(std::vector<Token>& tokens, bool& ok, int cap)
-{
-    ok = true;
-    std::vector<Token> exp;
-    int state = 0;
-    getExpBound(tokens, exp, state);
-    if(state == -1) {
-        ok = false;
-        return {};
-    }
-    vector<qreal> res = eval(exp, ok);
-    if(ok) {
-        if(res.size() < cap)
-        {
-            Report("This procedure needs more input(s)");
-            ok = false;
-            return {};
-        }
-        return res;
-    }
-    return {};
-}
-
-
 /*以下为关键字读入处理部分（模块化）*/
 
 bool MainWindow::dealPrint(std::vector<Token> & tokens)
@@ -396,6 +330,16 @@ bool MainWindow::dealTO(vector<Token> & tokens)
         Report(name + " is already in use.Try a different name.");
         return false;
     }
+    //寻找参数
+    vector<QString> Argnames;
+    while(!tokens.empty() && tokens.back().type == TokenType::IDENTIFIER)
+    {
+        Argnames.push_back(tokens.back().lexeme);
+        tokens.pop_back();
+    }
+
+    qDebug() << "owo" << Argnames.size();
+
     int reg_id = ProcNames.size() + 1;
     reDef = false;
     if(ProcNames.count(name))
@@ -408,12 +352,14 @@ bool MainWindow::dealTO(vector<Token> & tokens)
     {
         Procs.push_back(QStringList());
         ProcTokens.push_back(vector<Token>());
+        Args.push_back(Argnames);
         //ProcTokens.push_back(vector<vector<Token>>());
     }
     else
     {
         Procs[reg_id - 1] = QStringList();
         ProcTokens[reg_id - 1] = vector<Token>();
+        Args[reg_id - 1] = Argnames;
         //ProcTokens[reg_id - 1] = vector<vector<Token>>();
     }
     Defmode = true;
@@ -458,14 +404,14 @@ bool MainWindow::dealLocalMake(vector<Token> & tokens)
 {
     if(tokens.empty())
     {
-        Report("This procedure(MAKE) needs more input(s)");
+        Report("This procedure(LOCALMAKE) needs more input(s)");
         return false;
     }
     Token nextToken = tokens.back();
     tokens.pop_back();
     if(!(nextToken.type == TokenType::KEYWORD || nextToken.type == TokenType::IDENTIFIER))
     {
-        Report("This procedure(MAKE) needs more input(s)");
+        Report("This procedure(LOCALMAKE) needs more input(s)");
         return false;
     }
 

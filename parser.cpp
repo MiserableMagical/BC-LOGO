@@ -279,19 +279,37 @@ bool MainWindow::Parser(std::vector<Token> & tokens)
         return Parser(tokens);
     }
 
-    if(ProcNames.count(word.lexeme))//a process(without parameters)
+    if(ProcNames.count(word.lexeme))//进入一个过程
     {
         int id = ProcNames[word.lexeme];
         id--;
-        qDebug() << "?";
-        qDebug() << ProcTokens[id].size();
+        int ArgNum = Args[id].size();
+        bool ok = true;
+        vector<qreal> nums = getNums(tokens, ok, ArgNum);
+        //qDebug() << ArgNum << ' ' << ok;
+        if(ok == false)
+            return false;
+
+        //qDebug() << "?";
+        //qDebug() << ProcTokens[id].size();
         for(auto &x : ProcTokens[id]) qDebug() << x.lexeme << ' '<<(int)x.type;
 
         vector<Token> temp = ProcTokens[id];
         map<QString, int> varLayer_old = varLayer;
         rec_layers++;
+
+        //加载参数的临时变量
+        for(int i = 0;i < ArgNum;i++)
+        {
+            varNames[rec_layers][Args[id][i]] = nums[i];
+            varLayer[Args[id][i]] = rec_layers;
+        }
+
         if(!Parser(temp))
             return false;
+
+        //还原
+
         varNames[rec_layers].clear();
         rec_layers--;
         varLayer = varLayer_old;

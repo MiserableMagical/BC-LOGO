@@ -165,7 +165,7 @@ void MainWindow::loadFile()
     QStringList strs = text.split('\n');
     //开始压缩
     QString curText;
-    bool lastType = false;
+    bool lastType = false;//type = true 表示该行存在TO
     for(int i = 0;i < strs.size();i++)
     {
         bool thisType = checkType(strs[i]);
