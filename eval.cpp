@@ -1,3 +1,8 @@
+/*
+ * eval.cpp 表达式求值
+ * beacon_cwk 25/02/19
+*/
+
 #include "QFileDialog"
 #include "QFile"
 #include "QLineEdit"

@@ -20,6 +20,7 @@ SOURCES += \
     mylistener.cpp \
     painter_single.cpp \
     parser.cpp \
+    parser_control.cpp \
     parser_single.cpp
 
 HEADERS += \

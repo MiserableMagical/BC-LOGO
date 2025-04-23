@@ -1,3 +1,7 @@
+/*
+    painter_single.cpp 处理绘图
+    beacon_cwk 25/02/12
+*/
 
 #include "_cursor.h"
 #include "paint.h"

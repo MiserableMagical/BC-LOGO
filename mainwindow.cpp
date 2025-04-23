@@ -1,3 +1,8 @@
+/*
+ * mainwindow.cpp
+ * beacon_cwk 24/12/09
+*/
+
 #include "mainwindow.h"
 #include "QFileDialog"
 #include "ui_mainwindow.h"
@@ -9,7 +14,7 @@
 #include "QMessageBox"
 #include "mylistener.h"
 
-QString version = "V0.5[250408]";
+QString version = "V0.9[250423]";
 QString curText = "Beacon's Logo " + version + " for Windows x64\nWenkai Cheng\n";
 
 myListener *Lis;
@@ -38,7 +43,7 @@ void MainWindow::setListenerText(QString str)
 }*/
 
 
-void MainWindow::modifyText()//执行缓冲区的命令
+void MainWindow::bufferExec()//执行缓冲区的命令
 {
     QString curstr = cmd_buf.trimmed();
     apply(curstr, 0);
@@ -100,22 +105,12 @@ void MainWindow::apply(QString &str,bool echo)//现在echo只为false
         str = str.trimmed();
         vector<Token> curstr;
         Tokenize(str, curstr);
-        /*if(!str.isEmpty() && (str.section(' ',0,0)).toUpper() == "END")
-        {
-            Defmode = false;
-            ui->DefHint->hide();
-            if(!reDef) setListenerText(Def_name + " defined.");
-            else setListenerText(Def_name + " redefined.");
-            return;
-        }
-        if(echo)
-            setListenerText("> " + str);*/
 
         Procs[Def_id].append(str);
 
-        vector<Token> added;
         for(auto &curToken : curstr)
         {
+            qDebug() << curToken.lexeme;
             if(curToken.lexeme == "END")//End of definition
             {
                 Defmode = false;
@@ -126,12 +121,8 @@ void MainWindow::apply(QString &str,bool echo)//现在echo只为false
                 break;
             }
             if(curToken.type == TokenType::END_OF_INPUT) continue;
-            added.push_back(curToken);
-        }
-
-        for(auto &curToken : added)
             ProcTokens[Def_id].push_back(curToken);
-        //ProcTokens[Def_id].push_back(curstr);
+        }
     }
 }
 
@@ -201,7 +192,6 @@ bool MainWindow::saveFile(QString path)
     if(file.open(QFile::WriteOnly | QFile::Text))
     {
         QTextStream out(&file);
-        //out<<edit.toPlainText();
         for(auto &curProc : ProcNames)
         {
             out<<"TO "<<curProc.first<<'\n';
@@ -210,7 +200,7 @@ bool MainWindow::saveFile(QString path)
             {
                 out<<Procs[idx][i]<<'\n';
             }
-            out<<"END\n";
+            //out<<"END\n";
         }
         if(!file.commit())
         {
@@ -279,6 +269,37 @@ void MainWindow::initListener()
     highlighter = new MyHighlighter(Lis->document());
 }
 
+void MainWindow::About()
+{
+    QWidget * aboutWindow = new QWidget;
+    aboutWindow->resize(500,250);
+    aboutWindow->show();
+    QLabel * text = new QLabel(aboutWindow), * image1 = new QLabel(aboutWindow), *image2 = new QLabel(aboutWindow);
+
+    image1->move(135,20);
+    image1->resize(75,75);
+    image1->show();
+    image1->setPixmap(QPixmap(":/new/cursor/ICON2.jpg"));
+    image1->setScaledContents(true);
+
+    image2->move(290,20);
+    image2->resize(75,75);
+    image2->show();
+    image2->setPixmap(QPixmap(":/new/cursor/beacon.jpg"));
+    image2->setScaledContents(true);
+
+    text->move(100,100);
+    static QString aboutText = "Beacon's LOGO(BC LOGO) " + version + '\n'
+        + "Author: beacon_cwk\n"
+        + "QQ/Email: 2733630473@qq.com\n"
+        + "Used for study methods\n"
+        + "Thank you for trying this software!";
+    text->setText(aboutText);
+    text->setAlignment(Qt::AlignCenter);
+    text->setFont((QFont){"Consolas",12});
+    text->show();
+}
+
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
@@ -300,8 +321,11 @@ MainWindow::MainWindow(QWidget *parent)
     connect(ui->actionNew,&QAction::triggered,this,&MainWindow::launchEditor);
     connect(ui->actionSave,&QAction::triggered,this,&MainWindow::onSaveasFile);
     connect(ui->actionLoad,&QAction::triggered,this,&MainWindow::loadFile);
+
     connect(ui->actionClear,&QAction::triggered,Lis,&myListener::Clear);
     connect(ui->actionSelectAll,&QAction::triggered,Lis,&myListener::selectAll);
+
+    connect(ui->actionAbout,&QAction::triggered,this,&MainWindow::About);
     //connect(ui->lineEdit,&QLineEdit::editingFinished,this,&MainWindow::modifyText);
 
     //connect(ui->textEdit,&QTextEdit::);

@@ -40,7 +40,7 @@ void myListener::keyReleaseEvent(QKeyEvent* e)//回车
             cursor.movePosition(QTextCursor::EndOfLine, QTextCursor::KeepAnchor);
             if(!tmpText.isEmpty()) cursor.insertText(tmpText + '\n');
 
-            pMainWind -> modifyText();
+            pMainWind -> bufferExec();
             //qDebug() << pMainWind -> cmd_buf;
         }
     }

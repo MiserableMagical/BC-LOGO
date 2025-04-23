@@ -22,6 +22,7 @@ class MainWindow : public QMainWindow
     Q_OBJECT
 
     int rec_layers = 0;
+    int stop_flag = -1;
     bool reDef = false;
     QString Def_name = QString();
     int Def_id = -1;
@@ -38,12 +39,13 @@ public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
     void launchEditor();
+    void About();
     void readFile();
     void openFile();
     void loadFile();
     bool saveFile(QString path);
     void onSaveasFile();
-    void modifyText();
+    void bufferExec();
     void apply(QString &str,bool echo = true);
     void setListenerText(QString str);
     void initPArea();
@@ -80,6 +82,7 @@ private:
     bool dealMake(vector<Token>&);
     bool dealLocalMake(vector<Token>&);
     bool dealWhile(vector<Token>&);
+    bool dealSTOP(vector<Token>&);
     bool dealsetPCdec(vector<Token>&);
     Ui::MainWindow *ui;
 };

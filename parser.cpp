@@ -1,3 +1,8 @@
+/*
+ * parser.cpp 解释器主体函数
+ * beacon_cwk 25/02/12
+*/
+
 #include "QFileDialog"
 #include "QFile"
 #include "QLineEdit"
@@ -54,7 +59,8 @@ map<QString, Keywords> defaultNames = {
     {"SETX",Keywords::SETX},
     {"SETY",Keywords::SETY},
     {"SETXY",Keywords::SETXY},
-    {"LOCALMAKE",Keywords::LOCALMAKE}
+    {"LOCALMAKE",Keywords::LOCALMAKE},
+    {"STOP",Keywords::STOP}
 };
 
 Keywords keyConvert(QString name) {
@@ -96,10 +102,13 @@ bool MainWindow::Parser(std::vector<Token> & tokens)
         Report("Too many recursive calls");
         return false;
     }
+    if(rec_layers == stop_flag)
+    {
+        return true;
+    }
 
     //text = text.trimmed();
     Token word = tokens.back();
-    qDebug() << word.lexeme << (int)word.type;
     tokens.pop_back();
     if(word.type == TokenType::INVALID) {
         Report("Syntax Error");
@@ -130,6 +139,12 @@ bool MainWindow::Parser(std::vector<Token> & tokens)
     if(word.type == TokenType::KEYWORD && word.lexeme == "IFELSE")
     {
         if(!dealIFELSE(tokens)) return false;
+        return Parser(tokens);
+    }
+
+    if(word.type == TokenType::KEYWORD && word.lexeme == "STOP")
+    {
+        if(!dealSTOP(tokens)) return false;
         return Parser(tokens);
     }
 
@@ -290,9 +305,7 @@ bool MainWindow::Parser(std::vector<Token> & tokens)
         if(ok == false)
             return false;
 
-        //qDebug() << "?";
-        //qDebug() << ProcTokens[id].size();
-        for(auto &x : ProcTokens[id]) qDebug() << x.lexeme << ' '<<(int)x.type;
+        //for(auto &x : ProcTokens[id]) qDebug() << x.lexeme << ' '<<(int)x.type;
 
         vector<Token> temp = ProcTokens[id];
         map<QString, int> varLayer_old = varLayer;
@@ -309,10 +322,10 @@ bool MainWindow::Parser(std::vector<Token> & tokens)
             return false;
 
         //还原
-
         varNames[rec_layers].clear();
         rec_layers--;
         varLayer = varLayer_old;
+        stop_flag = -1;//撤销stop标记
         return Parser(tokens);
     }
 
