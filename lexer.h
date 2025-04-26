@@ -47,6 +47,7 @@ enum class Keywords {
     SETX,
     SETY,
     SETXY,
+    SETBG,
     SETPCDEC,
     LOCALMAKE,
     STOP,

@@ -5,7 +5,9 @@
 #include <QTextDocumentFragment>
 
 myListener::myListener() {
+    this->setStyleSheet("QTextEdit{color:white;}");
     this->setFont((QFont){"Courier",12});
+    this->setTextColor(Qt::black);
     this->setWordWrapMode(QTextOption::NoWrap);
     //connect(this, &myListener::cursorPositionChanged, this, &myListener::cursorLock);
 }

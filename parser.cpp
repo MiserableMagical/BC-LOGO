@@ -59,6 +59,7 @@ map<QString, Keywords> defaultNames = {
     {"SETX",Keywords::SETX},
     {"SETY",Keywords::SETY},
     {"SETXY",Keywords::SETXY},
+    {"SETBG",Keywords::SETBG},
     {"LOCALMAKE",Keywords::LOCALMAKE},
     {"STOP",Keywords::STOP}
 };
@@ -280,6 +281,12 @@ bool MainWindow::Parser(std::vector<Token> & tokens)
         return Parser(tokens);
     }
 
+    if(word.type == TokenType::KEYWORD && keyConvert(word.lexeme) == Keywords::SETBG)
+    {
+        if(!dealsetBG(tokens)) return false;
+        return Parser(tokens);
+    }
+
     if(word.type == TokenType::NUMBER || (word.type == TokenType::IDENTIFIER && isVariable(word.lexeme)) || word.type == TokenType::LPAREN)
     {
         tokens.push_back(word);
@@ -287,7 +294,6 @@ bool MainWindow::Parser(std::vector<Token> & tokens)
         qreal num = getNum(tokens, ok);
         if(ok == false)
         {
-            Report("Invalid Expression");
             return false;
         }
         Report("Result is : " + QString::number(num));

@@ -40,13 +40,15 @@ public:
     ~MainWindow();
     void launchEditor();
     void About();
+    void showHelp();
+    void savePic();
     void readFile();
     void openFile();
     void loadFile();
     bool saveFile(QString path);
     void onSaveasFile();
     void bufferExec();
-    void apply(QString &str,bool echo = true);
+    void apply(QString &str,bool echo = false);
     void setListenerText(QString str);
     void initPArea();
     void initListener();
@@ -84,6 +86,7 @@ private:
     bool dealWhile(vector<Token>&);
     bool dealSTOP(vector<Token>&);
     bool dealsetPCdec(vector<Token>&);
+    bool dealsetBG(vector<Token>&);
     Ui::MainWindow *ui;
 };
 #endif // MAINWINDOW_H

@@ -69,6 +69,11 @@ void PaintArea::setPC(QColor col){
     frame->penc = col;
 }
 
+void PaintArea::setBG(QColor col){
+    frame->pixmap->fill(col);
+    frame->repaint();
+}
+
 void PaintArea::setX(qreal x)
 {
     qreal &cx = cursor.X, &cy = cursor.Y;

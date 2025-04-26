@@ -13,8 +13,9 @@
 #include "QSaveFile"
 #include "QMessageBox"
 #include "mylistener.h"
+#include "QDesktopServices"
 
-QString version = "V0.9[250423]";
+QString version = "V0.9[250426]";
 QString curText = "Beacon's Logo " + version + " for Windows x64\nWenkai Cheng\n";
 
 myListener *Lis;
@@ -300,6 +301,31 @@ void MainWindow::About()
     text->show();
 }
 
+void MainWindow::showHelp()
+{
+    QString pdfPath = qApp->applicationDirPath() + "/help.pdf";
+    QDesktopServices::openUrl(QUrl::fromLocalFile(pdfPath));
+}
+
+void MainWindow::savePic()
+{
+    QPixmap *pixmap = PArea->getPixmap();
+
+    QFileDialog dialog(this);
+    dialog.setWindowModality(Qt::WindowModal);
+    dialog.setAcceptMode(QFileDialog::AcceptSave);
+    dialog.setNameFilter("JPEG(*.jpg)");
+    if(dialog.exec() != QDialog::Accepted)
+        return;
+
+    QString filePath = dialog.selectedFiles().first();
+    if (!pixmap->save(filePath, "JPEG")) {
+        setListenerText("Failed to save");
+    } else {
+        setListenerText("Successfully saved as " + filePath);
+    }
+}
+
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
@@ -321,11 +347,15 @@ MainWindow::MainWindow(QWidget *parent)
     connect(ui->actionNew,&QAction::triggered,this,&MainWindow::launchEditor);
     connect(ui->actionSave,&QAction::triggered,this,&MainWindow::onSaveasFile);
     connect(ui->actionLoad,&QAction::triggered,this,&MainWindow::loadFile);
+    connect(ui->actionSavePic,&QAction::triggered,this,&MainWindow::savePic);
 
     connect(ui->actionClear,&QAction::triggered,Lis,&myListener::Clear);
     connect(ui->actionSelectAll,&QAction::triggered,Lis,&myListener::selectAll);
 
     connect(ui->actionAbout,&QAction::triggered,this,&MainWindow::About);
+    connect(ui->actionShowHelp,&QAction::triggered,this,&MainWindow::showHelp);
+    //connect(ui->actionShowHelp,&QAction::triggered,this,&MainWindow::darkMode);
+    //connect(ui->actionShowHelp,&QAction::triggered,this,&MainWindow::lightMode);
     //connect(ui->lineEdit,&QLineEdit::editingFinished,this,&MainWindow::modifyText);
 
     //connect(ui->textEdit,&QTextEdit::);

@@ -74,6 +74,22 @@ bool MainWindow::dealsetPC(std::vector<Token> & tokens)
     return true;
 }
 
+bool MainWindow::dealsetBG(std::vector<Token> & tokens)
+{
+    if(tokens.empty() || tokens.back().type != TokenType::IDENTIFIER)
+    {
+        Report("This procedure(SETBG) needs more input(s)");
+        return false;
+    }
+    Token Word = tokens.back();
+    tokens.pop_back();
+    QString word = Word.lexeme;
+
+    QColor color(word);
+    PArea->setBG(color);
+    return true;
+}
+
 bool MainWindow::dealsetPCdec(std::vector<Token> & tokens)
 {
     bool ok;
@@ -259,7 +275,6 @@ bool MainWindow::dealMake(vector<Token> & tokens)
 
 bool MainWindow::dealLocalMake(vector<Token> & tokens)
 {
-    qDebug() << "???";
     if(tokens.empty())
     {
         Report("This procedure(LOCALMAKE) needs more input(s)");
@@ -283,7 +298,6 @@ bool MainWindow::dealLocalMake(vector<Token> & tokens)
 
     bool ok;
     double num = getNum(tokens, ok);
-    qDebug() << name << ' ' << num;
     if(ok == false)
         return false;
 

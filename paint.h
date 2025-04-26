@@ -95,7 +95,7 @@ class PaintArea{
         frame2->resize(902,402);
         frame->move(40,40);
         frame->resize(900,400);
-        frame->pixmap->fill(Qt::transparent);
+        frame->pixmap->fill(Qt::white);
         frame->raise();
         frame->x = frame->y = 0;
         cursor.img = new QLabel;
@@ -115,6 +115,7 @@ class PaintArea{
     void setX(qreal);
     void setY(qreal);
     void setXY(qreal,qreal);
+    void setBG(QColor);
     void clearScreen();
     void showTurtle();
     void hideTurtle();
@@ -126,5 +127,9 @@ class PaintArea{
         frame->x = cursor.X;
         frame->y = cursor.Y;
         cursor.sync();
+    }
+    QPixmap * getPixmap()
+    {
+        return frame->pixmap;
     }
 };

@@ -26,7 +26,7 @@ void Lexer::advance() {
 }
 
 void Lexer::skipWhitespace() {
-    while ((currentChar().isSpace())) {
+    while ((currentChar().isSpace()) || currentChar() == ':' || currentChar() == '\'') {
         advance();
     }
 }
