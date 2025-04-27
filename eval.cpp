@@ -9,6 +9,7 @@
 #include "QRegularExpression"
 #include "mainwindow.h"
 #include <stack>
+#include <random>
 
 #define Report setListenerText
 #define RegExp QRegularExpression
@@ -25,12 +26,22 @@ std::unordered_map<QString, int> precedence = {
     {"-", 101},
     {"*", 102},
     {"/", 102},
-    {"%", 102}
+    {"%", 102},
+    {"RANDOM", 1000},
+    {"SIN",1000},
+    {"COS",1000}
 };
 
 // 判断字符是否为运算符
 bool isOperator(QString c) {
     return precedence.find(c) != precedence.end();
+}
+
+extern map<QString, Keywords> mathFunctions;
+
+bool MainWindow::isFunction(QString name)
+{
+    return mathFunctions.count(name);
 }
 
 // 比较两个运算符的优先级
@@ -43,6 +54,13 @@ bool Truth(qreal val)
 {
     if(abs(val) < Epsilon) return 0;
     return 1;
+}
+
+std::mt19937 randgen(time(0));
+int getRand(int lim)
+{
+    if(lim <= 1) return 1;
+    return std::abs(int(randgen())) % lim + 1;
 }
 
 vector<qreal> MainWindow::eval(vector<Token> &expr, bool &isValid)
@@ -79,12 +97,12 @@ vector<qreal> MainWindow::eval(vector<Token> &expr, bool &isValid)
                 }
                 stack.pop();
             }
-            else if(c.type == TokenType::OPERATOR) {
-                while (!stack.empty() && stack.top() != "(" && hasHigherPrecedence(stack.top(), c.lexeme[0])) {
+            else if(c.type == TokenType::OPERATOR || (c.type == TokenType::IDENTIFIER && isFunction(c.lexeme))) {
+                while (!stack.empty() && stack.top() != "(" && hasHigherPrecedence(stack.top(), c.lexeme)) {
                     post.push_back(stack.top());
                     stack.pop();
                 }
-                stack.push(c.lexeme[0]);
+                stack.push(c.lexeme);
             }
             else {
                 isValid = false;
@@ -106,13 +124,41 @@ vector<qreal> MainWindow::eval(vector<Token> &expr, bool &isValid)
     std::stack<qreal> results;
     for(QString &cur : post)
     {
-        if(precedence.count(cur[0]) && (cur.size() == 1 || !cur[1].isDigit()) /*cur == "+" || cur == "-" || cur == "*" || cur == "/"*/)
+        qDebug() << cur;
+        if(precedence.count(cur)) /*cur == "+" || cur == "-" || cur == "*" || cur == "/"*/
         {
             if(results.size() == 1 && cur == "-") //按负号处理
             {
                 qreal fir = results.top();
                 results.pop();
                 results.push(-fir);
+                continue;
+            }
+            if(results.size() < 1)
+            {
+                setListenerText("Invalid Expression");
+                isValid = false;
+                return {};
+            }
+            if(cur == "SIN")
+            {
+                qreal top = results.top();
+                results.pop();
+                results.push(sin(top));
+                continue;
+            }
+            if(cur == "COS")
+            {
+                qreal top = results.top();
+                results.pop();
+                results.push(cos(top));
+                continue;
+            }
+            if(cur == "RANDOM")
+            {
+                qreal top = results.top();
+                results.pop();
+                results.push(getRand(top + Epsilon));
                 continue;
             }
             if(results.size() < 2)
@@ -183,7 +229,7 @@ void MainWindow::getExpBound(std::vector<Token> & tokens,std::vector<Token> & ex
     {
         //nonEmpty = true;
         if(tokens.back().type == TokenType::IDENTIFIER) {// check if it's a variable
-            if(!isVariable(tokens.back().lexeme)) break;
+            if(!isVariable(tokens.back().lexeme) && !isFunction(tokens.back().lexeme)) break;
         }
         exp.push_back(tokens.back());
         tokens.pop_back();

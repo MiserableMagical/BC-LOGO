@@ -39,10 +39,12 @@ void PaintArea::clearScreen(){
 }
 
 void PaintArea::Home(){
-    cursor.X = 0;
-    cursor.Y = 0;
-    cursor.Deg = -PI / 2.0;
+    qreal &cx = cursor.X, &cy = cursor.Y;
+    frame->Line(0, 0);
+    cx = 0;
+    cy = 0;
     sync();
+    frame->repaint();
 }
 
 void PaintArea::showTurtle(){

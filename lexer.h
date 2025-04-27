@@ -41,6 +41,7 @@ enum class Keywords {
     MAKE,
     PRINT,
     SETPC,
+    WAIT,
     IF,
     IFELSE,
     WHILE,
@@ -51,6 +52,9 @@ enum class Keywords {
     SETPCDEC,
     LOCALMAKE,
     STOP,
+    RANDOM,
+    SIN,
+    COS,
     PLACEHOLDER
 };
 

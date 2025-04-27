@@ -61,7 +61,14 @@ map<QString, Keywords> defaultNames = {
     {"SETXY",Keywords::SETXY},
     {"SETBG",Keywords::SETBG},
     {"LOCALMAKE",Keywords::LOCALMAKE},
-    {"STOP",Keywords::STOP}
+    {"STOP",Keywords::STOP},
+    {"WAIT",Keywords::WAIT}
+};
+
+map<QString, Keywords> mathFunctions = {
+    {"RANDOM",Keywords::RANDOM},
+    {"SIN",Keywords::SIN},
+    {"COS",Keywords::COS}
 };
 
 Keywords keyConvert(QString name) {
@@ -287,7 +294,8 @@ bool MainWindow::Parser(std::vector<Token> & tokens)
         return Parser(tokens);
     }
 
-    if(word.type == TokenType::NUMBER || (word.type == TokenType::IDENTIFIER && isVariable(word.lexeme)) || word.type == TokenType::LPAREN)
+    if(word.type == TokenType::NUMBER || (word.type == TokenType::IDENTIFIER && isVariable(word.lexeme))
+        || word.type == TokenType::LPAREN || ((word.type == TokenType::IDENTIFIER && isFunction(word.lexeme))))
     {
         tokens.push_back(word);
         bool ok;

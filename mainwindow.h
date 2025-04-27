@@ -65,6 +65,7 @@ private:
     void getExpBound(std::vector<Token>&,std::vector<Token>&,int&);
     vector<qreal> eval(vector<Token>&,bool &isValid);
     bool isVariable(QString);
+    bool isFunction(QString);
     qreal getVariable(QString);
     //separate functions
     bool dealPrint(vector<Token>&);

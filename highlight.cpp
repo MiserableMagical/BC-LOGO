@@ -1,3 +1,8 @@
+/*
+ * highlight.cpp 语法高亮
+ * beacon_cwk 25/02/14
+*/
+
 #include "mainwindow.h"
 #include "mylistener.h"
 #include "QTextCharFormat"
@@ -5,16 +10,13 @@
 using std::set;
 using std::map;
 extern map<QString,Keywords> defaultNames;
+extern map<QString,Keywords> mathFunctions;
 
 MyHighlighter::MyHighlighter(QTextDocument *parent)
     : QSyntaxHighlighter(parent) {
     // 定义关键字的格式
     keywordFormat.setForeground(Qt::darkBlue);
     keywordFormat.setFontWeight(QFont::Bold);
-
-    // 定义注释的格式
-    commentFormat.setForeground(Qt::darkGreen);
-    commentFormat.setFontItalic(true);
 
     //数字
     numFormat.setForeground((QColor){110,60,0});//Brown
@@ -31,6 +33,10 @@ MyHighlighter::MyHighlighter(QTextDocument *parent)
     //keywordPatterns << "\\bif\\b" << "\\belse\\b" << "\\bwhile\\b"
     //                << "\\breturn\\b" << "\\bclass\\b" << "\\bvoid\\b";
     for(auto &str : defaultNames)
+    {
+        keywordPatterns << "\\b" + str.first + "\\b";
+    }
+    for(auto &str : mathFunctions)
     {
         keywordPatterns << "\\b" + str.first + "\\b";
     }
