@@ -88,6 +88,7 @@ private:
     bool dealSTOP(vector<Token>&);
     bool dealsetPCdec(vector<Token>&);
     bool dealsetBG(vector<Token>&);
+    bool dealClean(vector<Token>&);
     Ui::MainWindow *ui;
 };
 #endif // MAINWINDOW_H

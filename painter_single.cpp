@@ -38,6 +38,12 @@ void PaintArea::clearScreen(){
     frame->repaint();
 }
 
+void PaintArea::Clean(){
+    frame->clear();
+    sync();
+    frame->repaint();
+}
+
 void PaintArea::Home(){
     qreal &cx = cursor.X, &cy = cursor.Y;
     frame->Line(0, 0);

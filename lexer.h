@@ -52,6 +52,7 @@ enum class Keywords {
     SETPCDEC,
     LOCALMAKE,
     STOP,
+    CLEAN,
     RANDOM,
     SIN,
     COS,

@@ -87,17 +87,9 @@
     <addaction name="actionAbout"/>
     <addaction name="actionShowHelp"/>
    </widget>
-   <widget class="QMenu" name="menu_2">
-    <property name="title">
-     <string>外观</string>
-    </property>
-    <addaction name="actionDarkmode"/>
-    <addaction name="actionLightmode"/>
-   </widget>
    <addaction name="menuFile"/>
    <addaction name="menuEdit"/>
    <addaction name="menu"/>
-   <addaction name="menu_2"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
   <action name="actionOpen">

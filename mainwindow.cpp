@@ -357,8 +357,6 @@ MainWindow::MainWindow(QWidget *parent)
     //connect(ui->actionShowHelp,&QAction::triggered,this,&MainWindow::darkMode);
     //connect(ui->actionShowHelp,&QAction::triggered,this,&MainWindow::lightMode);
     //connect(ui->lineEdit,&QLineEdit::editingFinished,this,&MainWindow::modifyText);
-
-    //connect(ui->textEdit,&QTextEdit::);
 }
 
 MainWindow::~MainWindow()

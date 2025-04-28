@@ -70,14 +70,21 @@ vector<qreal> MainWindow::eval(vector<Token> &expr, bool &isValid)
     QString Num;
     std::vector<QString> post;
 
+    bool needOP = false;
     for (auto c : expr) {
-        if(c.type == TokenType::NUMBER)
+        if(c.type == TokenType::NUMBER || (c.type == TokenType::IDENTIFIER && isVariable(c.lexeme)))
         {
-            post.push_back(c.lexeme);
-        }
-        else if(c.type == TokenType::IDENTIFIER && isVariable(c.lexeme))
-        {
-            post.push_back(QString::number(getVariable(c.lexeme)));
+            if(needOP)
+            {
+                //弹出所有运算符
+                while (!stack.empty()) {
+                    post.push_back(stack.top());
+                    stack.pop();
+                }
+            }
+            if(c.type == TokenType::NUMBER) post.push_back(c.lexeme);
+            else post.push_back(QString::number(getVariable(c.lexeme)));
+            needOP = true;
         }
         else
         {
@@ -103,6 +110,7 @@ vector<qreal> MainWindow::eval(vector<Token> &expr, bool &isValid)
                     stack.pop();
                 }
                 stack.push(c.lexeme);
+                if(!isFunction(c.lexeme)) needOP = false;
             }
             else {
                 isValid = false;
@@ -124,7 +132,6 @@ vector<qreal> MainWindow::eval(vector<Token> &expr, bool &isValid)
     std::stack<qreal> results;
     for(QString &cur : post)
     {
-        qDebug() << cur;
         if(precedence.count(cur)) /*cur == "+" || cur == "-" || cur == "*" || cur == "/"*/
         {
             if(results.size() == 1 && cur == "-") //按负号处理

@@ -14,6 +14,7 @@
 #endif // PAINT_H
 
 //QFrame_是画图区域本身，用于处理图形绘制
+const int paintHeight = 400, paintWidth = 900;
 class QFrame_ : public QFrame{
     /*public : QPainterPath path;
     public : void paintEvent(QPaintEvent * event)
@@ -31,7 +32,7 @@ class QFrame_ : public QFrame{
         setPalette(QPalette(Qt::white));
         painter.drawPath(path);
     }*/
-public : QPixmap *pixmap = new QPixmap(900, 400);
+public : QPixmap *pixmap = new QPixmap(paintWidth, paintHeight);
     double x,y;//当前位置
     int penw = 1;
     QColor penc = Qt::black;
@@ -47,7 +48,7 @@ public : QPixmap *pixmap = new QPixmap(900, 400);
         QPainter painter(pixmap);
         QPen pen;
         QBrush brush;
-        painter.translate(450,200);
+        painter.translate(paintWidth / 2, paintHeight / 2);
         painter.setRenderHint(QPainter::Antialiasing);
         painter.setRenderHint(QPainter::SmoothPixmapTransform);
         brush.setColor(Qt::white);
@@ -68,7 +69,7 @@ public : QPixmap *pixmap = new QPixmap(900, 400);
     }
     void clear()
     {
-        pixmap->fill(Qt::transparent);
+        pixmap->fill(Qt::white);
     }
 };
 
@@ -92,9 +93,9 @@ class PaintArea{
         frame2->setFrameShape(QFrame::StyledPanel);
         frame2->setFrameShadow(QFrame::Raised);
         frame2->move(39,39);
-        frame2->resize(902,402);
+        frame2->resize(paintWidth + 2, paintHeight + 2);
         frame->move(40,40);
-        frame->resize(900,400);
+        frame->resize(paintWidth, paintHeight);
         frame->pixmap->fill(Qt::white);
         frame->raise();
         frame->x = frame->y = 0;
@@ -117,6 +118,7 @@ class PaintArea{
     void setXY(qreal,qreal);
     void setBG(QColor);
     void clearScreen();
+    void Clean();
     void showTurtle();
     void hideTurtle();
     void penUp();

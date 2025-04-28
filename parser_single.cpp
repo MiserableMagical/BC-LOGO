@@ -138,6 +138,7 @@ bool MainWindow::dealsetXY(std::vector<Token> & tokens)
     vector<qreal> res = getNums(tokens, ok, 2);
     if(ok == false)
         return false;
+    //qDebug() << res[0] << ' ' << res[1];
     PArea->setXY(res[0], res[1]);
     return true;
 }
@@ -210,8 +211,6 @@ bool MainWindow::dealTO(vector<Token> & tokens)
         Argnames.push_back(tokens.back().lexeme);
         tokens.pop_back();
     }
-
-    qDebug() << "owo" << Argnames.size();
 
     int reg_id = ProcNames.size() + 1;
     reDef = false;

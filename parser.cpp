@@ -62,7 +62,8 @@ map<QString, Keywords> defaultNames = {
     {"SETBG",Keywords::SETBG},
     {"LOCALMAKE",Keywords::LOCALMAKE},
     {"STOP",Keywords::STOP},
-    {"WAIT",Keywords::WAIT}
+    {"WAIT",Keywords::WAIT},
+    {"CLEAN",Keywords::CLEAN}
 };
 
 map<QString, Keywords> mathFunctions = {
@@ -194,12 +195,12 @@ bool MainWindow::Parser(std::vector<Token> & tokens)
         return Parser(tokens);
     }
 
-    if(word.type == TokenType::KEYWORD && word.lexeme == "CS") {
+    if(word.type == TokenType::KEYWORD && keyConvert(word.lexeme) == Keywords::CS) {
         PArea->clearScreen();
         return Parser(tokens);
     }
 
-    if(word.type == TokenType::KEYWORD && word.lexeme == "HOME") {
+    if(word.type == TokenType::KEYWORD && keyConvert(word.lexeme) == Keywords::HOME) {
         PArea->Home();
         return Parser(tokens);
     }
@@ -294,6 +295,12 @@ bool MainWindow::Parser(std::vector<Token> & tokens)
         return Parser(tokens);
     }
 
+    if(word.type == TokenType::KEYWORD && keyConvert(word.lexeme) == Keywords::CLEAN)
+    {
+        PArea->Clean();
+        return Parser(tokens);
+    }
+
     if(word.type == TokenType::NUMBER || (word.type == TokenType::IDENTIFIER && isVariable(word.lexeme))
         || word.type == TokenType::LPAREN || ((word.type == TokenType::IDENTIFIER && isFunction(word.lexeme))))
     {
@@ -310,22 +317,20 @@ bool MainWindow::Parser(std::vector<Token> & tokens)
 
     if(ProcNames.count(word.lexeme))//进入一个过程
     {
-        int id = ProcNames[word.lexeme];
+        int id = ProcNames[word.lexeme];//获取过程编号
         id--;
         int ArgNum = Args[id].size();
         bool ok = true;
-        vector<qreal> nums = getNums(tokens, ok, ArgNum);
-        //qDebug() << ArgNum << ' ' << ok;
+        vector<qreal> nums = getNums(tokens, ok, ArgNum);//获取参数
         if(ok == false)
             return false;
 
-        //for(auto &x : ProcTokens[id]) qDebug() << x.lexeme << ' '<<(int)x.type;
 
         vector<Token> temp = ProcTokens[id];
         map<QString, int> varLayer_old = varLayer;
         rec_layers++;
 
-        //加载参数的临时变量
+        /*加载参数的临时变量*/
         for(int i = 0;i < ArgNum;i++)
         {
             varNames[rec_layers][Args[id][i]] = nums[i];
@@ -335,7 +340,7 @@ bool MainWindow::Parser(std::vector<Token> & tokens)
         if(!Parser(temp))
             return false;
 
-        //还原
+        /*还原*/
         varNames[rec_layers].clear();
         rec_layers--;
         varLayer = varLayer_old;

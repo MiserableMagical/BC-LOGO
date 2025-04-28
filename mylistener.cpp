@@ -24,7 +24,6 @@ void myListener::keyReleaseEvent(QKeyEvent* e)//回车
     {
         if (this->pWindow)
         {
-            //qDebug() <<"Event triggered";
             pMainWind = (MainWindow*)pWindow;
             totLines++;
 
@@ -43,7 +42,6 @@ void myListener::keyReleaseEvent(QKeyEvent* e)//回车
             if(!tmpText.isEmpty()) cursor.insertText(tmpText + '\n');
 
             pMainWind -> bufferExec();
-            //qDebug() << pMainWind -> cmd_buf;
         }
     }
 }
@@ -53,7 +51,7 @@ void myListener::cursorLock()
 {
     QTextDocument *doc = this->document();
     QTextCursor cursor = this->textCursor();
-    //qDebug()<<cursor.blockNumber();
+
     if(cursor.blockNumber() + 1 < doc->blockCount())
     {
         cursor.movePosition(QTextCursor::End);
