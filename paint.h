@@ -1,3 +1,8 @@
+/*
+ * paint.h 绘图区域定义与部分代码
+ * beacon_cwk 25/04/23
+*/
+
 #include "mainwindow.h"
 #include "QFileDialog"
 #include "ui_mainwindow.h"

@@ -28,7 +28,7 @@ map<QString, Keywords> defaultNames = {
     {"FD", Keywords::FD},
     {"FORWARD",Keywords::FD},
     {"BK", Keywords::BK},
-    {"BACKWARD",Keywords::BK},
+    {"BACK",Keywords::BK},
     {"LT", Keywords::LT},
     {"LEFT",Keywords::LT},
     {"RT", Keywords::RT},
@@ -47,6 +47,7 @@ map<QString, Keywords> defaultNames = {
     {"END",Keywords::END},
     {"HOME",Keywords::HOME},
     {"SETW",Keywords::SETW},
+    {"SETWIDTH",Keywords::SETW},
     {"MAKE",Keywords::MAKE},
     {"PRINT",Keywords::PRINT},
     {"SETPC",Keywords::SETPC},
@@ -127,31 +128,31 @@ bool MainWindow::Parser(std::vector<Token> & tokens)
         return true;
     //word = word.toUpper();
 
-    if(word.type == TokenType::KEYWORD && word.lexeme == "PRINT")
+    if(word.type == TokenType::KEYWORD && keyConvert(word.lexeme) == Keywords::PRINT)
     {
         if(!dealPrint(tokens)) return false;
         return Parser(tokens);
     }
 
-    if(word.type == TokenType::KEYWORD && word.lexeme == "WHILE")
+    if(word.type == TokenType::KEYWORD && keyConvert(word.lexeme) == Keywords::WHILE)
     {
         if(!dealWhile(tokens)) return false;
         return Parser(tokens);
     }
 
-    if(word.type == TokenType::KEYWORD && word.lexeme == "IF")
+    if(word.type == TokenType::KEYWORD && keyConvert(word.lexeme) == Keywords::IF)
     {
         if(!dealIF(tokens)) return false;
         return Parser(tokens);
     }
 
-    if(word.type == TokenType::KEYWORD && word.lexeme == "IFELSE")
+    if(word.type == TokenType::KEYWORD && keyConvert(word.lexeme) == Keywords::IFELSE)
     {
         if(!dealIFELSE(tokens)) return false;
         return Parser(tokens);
     }
 
-    if(word.type == TokenType::KEYWORD && word.lexeme == "STOP")
+    if(word.type == TokenType::KEYWORD && keyConvert(word.lexeme) == Keywords::STOP)
     {
         if(!dealSTOP(tokens)) return false;
         return Parser(tokens);
@@ -169,7 +170,7 @@ bool MainWindow::Parser(std::vector<Token> & tokens)
         return Parser(tokens);
     }
 
-    if(word.type == TokenType::KEYWORD && word.lexeme == "WAIT")
+    if(word.type == TokenType::KEYWORD && keyConvert(word.lexeme) == Keywords::WAIT)
     {
         bool ok;
         double num = getNum(tokens, ok);
@@ -179,7 +180,7 @@ bool MainWindow::Parser(std::vector<Token> & tokens)
         return Parser(tokens);
     }
 
-    if(word.type == TokenType::KEYWORD && word.lexeme == "TO")
+    if(word.type == TokenType::KEYWORD && keyConvert(word.lexeme) == Keywords::TO)
     {
         if(!dealTO(tokens)) return false;
         return true;

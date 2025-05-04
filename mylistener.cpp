@@ -1,3 +1,8 @@
+/*
+ * mylistener.cpp 听者
+ * beacon_cwk 25/02/12
+*/
+
 #include "mylistener.h"
 #include <QDebug>
 #include <QKeyEvent>

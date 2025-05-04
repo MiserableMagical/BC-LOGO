@@ -1,3 +1,8 @@
+/*
+ * lexer.cpp 词法分析器
+ * beacon_cwk 25/02/26
+*/
+
 #include "QString"
 #include "set"
 #include "lexer.h"
