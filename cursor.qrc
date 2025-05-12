@@ -1,0 +1,7 @@
+<RCC>
+    <qresource prefix="/new/cursor">
+        <file>CURSOR.jpg</file>
+        <file>ICON2.jpg</file>
+        <file>beacon.jpg</file>
+    </qresource>
+</RCC>
