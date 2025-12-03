@@ -15,7 +15,7 @@
 #include "mylistener.h"
 #include "QDesktopServices"
 
-QString version = "V1.0";
+QString version = "V1.0.1";
 QString curText = "Beacon's Logo " + version + " for Windows x64\nWenkai Cheng\n";
 
 myListener *Lis;

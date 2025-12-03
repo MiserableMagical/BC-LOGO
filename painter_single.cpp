@@ -85,7 +85,10 @@ void PaintArea::setBG(QColor col){
 void PaintArea::setX(qreal x)
 {
     qreal &cx = cursor.X, &cy = cursor.Y;
-    frame->Line(x, cy);
+    if(penD)
+        frame->Line(x, cy);
+    else
+        frame->moveTo(x, cy);
     cx = x;
     sync();
     frame->repaint();
@@ -94,7 +97,10 @@ void PaintArea::setX(qreal x)
 void PaintArea::setY(qreal y)
 {
     qreal &cx = cursor.X, &cy = cursor.Y;
-    frame->Line(cx, y);
+    if(penD)
+        frame->Line(cx, y);
+    else
+        frame->moveTo(cx, y);
     cy = y;
     sync();
     frame->repaint();
@@ -103,7 +109,10 @@ void PaintArea::setY(qreal y)
 void PaintArea::setXY(qreal x,qreal y)
 {
     qreal &cx = cursor.X, &cy = cursor.Y;
-    frame->Line(x, y);
+    if(penD)
+        frame->Line(x, y);
+    else
+        frame->moveTo(x, y);
     cx = x;
     cy = y;
     sync();
