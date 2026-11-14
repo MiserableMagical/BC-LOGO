@@ -84,6 +84,7 @@ class PaintArea{
     QFrame_ *frame;
     QFrame *frame2;
     bool penD = true;
+    QColor bgc = Qt::white;   // 记录当前背景色，供无头快照使用
 
 
     int Turns_X(double pos);
@@ -139,4 +140,14 @@ class PaintArea{
     {
         return frame->pixmap;
     }
+
+    /* 只读访问器：阶段 0 的无头 CLI 用它输出终态快照，
+       后续回归测试也依赖这组接口，不要在这里产生副作用。 */
+    double turtleX() const { return cursor.X; }
+    double turtleY() const { return cursor.Y; }
+    double turtleAngleDeg() const { return cursor.Deg * 180.0 / PI; }
+    bool penIsDown() const { return penD; }
+    int penWidth() const { return frame->penw; }
+    QColor penColor() const { return frame->penc; }
+    QColor backgroundColor() const { return bgc; }
 };

@@ -14,11 +14,15 @@
 #include "QMessageBox"
 #include "mylistener.h"
 #include "QDesktopServices"
+#include "QCryptographicHash"
+#include "QImage"
 
 QString version = "V1.0.1";
 QString curText = "Beacon's Logo " + version + " for Windows x64\nWenkai Cheng\n";
 
 myListener *Lis;
+
+extern PaintArea *PArea;   // 定义在本文件末尾的 initPArea() 附近
 
 void MainWindow::setListenerText(QString str)
 {
@@ -32,6 +36,42 @@ void MainWindow::setListenerText(QString str)
     Lis->append("");
     Lis->moveCursor(QTextCursor::End);
     Lis->ensureCursorVisible();
+}
+
+/* 阶段 0：给无头 CLI / 回归测试用的三个只读接口。
+   注意：transcript() 读取的是 Lis 的纯文本，clearTranscript() 只清屏不碰解释器状态。 */
+QString MainWindow::transcript() const
+{
+    return Lis ? Lis->toPlainText() : QString();
+}
+
+void MainWindow::clearTranscript()
+{
+    if (Lis) Lis->Clear();
+}
+
+QString MainWindow::stateSnapshot() const
+{
+    const auto num = [](double v) {
+        if (qAbs(v) < 5e-7) v = 0.0;   // 抹掉 cos(-pi/2) 之类的浮点噪声
+        return QString::number(v, 'f', 6);
+    };
+
+    const QImage image = PArea->getPixmap()->toImage().convertToFormat(QImage::Format_ARGB32);
+    const QByteArray bytes(reinterpret_cast<const char *>(image.constBits()),
+                           image.sizeInBytes());
+    const QByteArray digest = QCryptographicHash::hash(bytes, QCryptographicHash::Sha1).toHex();
+
+    QString s;
+    s += "x=" + num(PArea->turtleX()) + "\n";
+    s += "y=" + num(PArea->turtleY()) + "\n";
+    s += "angle=" + num(PArea->turtleAngleDeg()) + "\n";
+    s += QString("pen=%1\n").arg(PArea->penIsDown() ? 1 : 0);
+    s += QString("width=%1\n").arg(PArea->penWidth());
+    s += "color=" + PArea->penColor().name(QColor::HexArgb) + "\n";
+    s += "bg=" + PArea->backgroundColor().name(QColor::HexArgb) + "\n";
+    s += "image=sha1:" + QString::fromLatin1(digest) + "\n";
+    return s;
 }
 
 /*void MainWindow::modifyText()

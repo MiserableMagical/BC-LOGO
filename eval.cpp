@@ -50,6 +50,9 @@ bool hasHigherPrecedence(QString op1, QString op2) {
 }
 
 const qreal Epsilon = 1e-11;
+// 三角函数统一按角度制求值（PC Logo 语义）；内部换算成弧度。
+constexpr qreal kPi = 3.14159265358979323846;
+constexpr qreal kDegToRad = kPi / 180.0;
 bool Truth(qreal val)
 {
     if(abs(val) < Epsilon) return 0;
@@ -151,14 +154,14 @@ vector<qreal> MainWindow::eval(vector<Token> &expr, bool &isValid)
             {
                 qreal top = results.top();
                 results.pop();
-                results.push(sin(top));
+                results.push(sin(top * kDegToRad));
                 continue;
             }
             if(cur == "COS")
             {
                 qreal top = results.top();
                 results.pop();
-                results.push(cos(top));
+                results.push(cos(top * kDegToRad));
                 continue;
             }
             if(cur == "RANDOM")

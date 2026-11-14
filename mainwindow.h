@@ -50,6 +50,10 @@ public:
     void bufferExec();
     void apply(QString &str,bool echo = false);
     void setListenerText(QString str);
+    // 阶段 0：无头脚本执行 / 回归基线用的只读接口
+    QString transcript() const;
+    void clearTranscript();
+    QString stateSnapshot() const;
     void initPArea();
     void initListener();
 

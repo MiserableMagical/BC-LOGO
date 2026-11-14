@@ -31,6 +31,7 @@ void PaintArea::turnRight(double deg){
 
 void PaintArea::clearScreen(){
     frame->clear();
+    bgc = Qt::white;
     cursor.X = 0;
     cursor.Y = 0;
     cursor.Deg = -PI / 2.0;
@@ -40,6 +41,7 @@ void PaintArea::clearScreen(){
 
 void PaintArea::Clean(){
     frame->clear();
+    bgc = Qt::white;
     sync();
     frame->repaint();
 }
@@ -49,6 +51,7 @@ void PaintArea::Home(){
     frame->Line(0, 0);
     cx = 0;
     cy = 0;
+    cursor.Deg = -PI / 2.0;   // HOME 同时复位朝向（向上）
     sync();
     frame->repaint();
 }
@@ -79,6 +82,7 @@ void PaintArea::setPC(QColor col){
 
 void PaintArea::setBG(QColor col){
     frame->pixmap->fill(col);
+    bgc = col;
     frame->repaint();
 }
 
