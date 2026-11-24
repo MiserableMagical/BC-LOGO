@@ -11,25 +11,46 @@ CONFIG += c++17
 VERSION = 1.0.0
 
 SOURCES += \
+    core/source.cpp \
+    core/diagnostic.cpp \
+    core/lexer.cpp \
+    core/ast.cpp \
+    core/builtins.cpp \
+    core/parser.cpp \
+    core/interpreter.cpp \
+    core/engine.cpp \
     editor.cpp \
-    eval.cpp \
     highlight.cpp \
-    lexer.cpp \
     main.cpp \
     mainwindow.cpp \
     mylistener.cpp \
     painter_single.cpp \
-    parser.cpp \
-    parser_control.cpp \
-    parser_single.cpp
+    qtconsole.cpp \
+    qtplotter.cpp
 
 HEADERS += \
     _cursor.h \
+    core/source.h \
+    core/span.h \
+    core/token.h \
+    core/lexer.h \
+    core/diagnostic.h \
+    core/diagnostic_codes.h \
+    core/ast.h \
+    core/builtins.h \
+    core/procedure.h \
+    core/parser.h \
+    core/value.h \
+    core/environment.h \
+    core/runtime.h \
+    core/interpreter.h \
+    core/engine.h \
     editor.h \
-    lexer.h \
     mainwindow.h \
     mylistener.h \
-    paint.h
+    paint.h \
+    qtconsole.h \
+    qtplotter.h
 
 FORMS += \
     mainwindow.ui
@@ -42,5 +63,4 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 !isEmpty(target.path): INSTALLS += target
 
 RESOURCES += \
-    cursor.qrc \
     cursor.qrc

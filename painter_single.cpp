@@ -48,7 +48,10 @@ void PaintArea::Clean(){
 
 void PaintArea::Home(){
     qreal &cx = cursor.X, &cy = cursor.Y;
-    frame->Line(0, 0);
+    if(penD)
+        frame->Line(0, 0);
+    else
+        frame->moveTo(0, 0);
     cx = 0;
     cy = 0;
     cursor.Deg = -PI / 2.0;   // HOME 同时复位朝向（向上）

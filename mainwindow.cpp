@@ -7,7 +7,6 @@
 #include "QFileDialog"
 #include "ui_mainwindow.h"
 #include "QFile"
-#include "QLineEdit"
 #include "paint.h"
 #include "editor.h"
 #include "QSaveFile"
@@ -17,12 +16,16 @@
 #include "QCryptographicHash"
 #include "QImage"
 
-QString version = "V1.0.1";
+#include "core/engine.h"
+#include "core/source.h"
+#include "qtconsole.h"
+#include "qtplotter.h"
+
+QString version = "V2.0";
 QString curText = "Beacon's Logo " + version + " for Windows x64\nWenkai Cheng\n";
 
 myListener *Lis;
-
-extern PaintArea *PArea;   // 定义在本文件末尾的 initPArea() 附近
+PaintArea *PArea = nullptr;
 
 void MainWindow::setListenerText(QString str)
 {
@@ -38,8 +41,6 @@ void MainWindow::setListenerText(QString str)
     Lis->ensureCursorVisible();
 }
 
-/* 阶段 0：给无头 CLI / 回归测试用的三个只读接口。
-   注意：transcript() 读取的是 Lis 的纯文本，clearTranscript() 只清屏不碰解释器状态。 */
 QString MainWindow::transcript() const
 {
     return Lis ? Lis->toPlainText() : QString();
@@ -74,183 +75,75 @@ QString MainWindow::stateSnapshot() const
     return s;
 }
 
-/*void MainWindow::modifyText()
-{
-    QString curstr = ui->lineEdit->text();
-    curText += curstr;
-    curText += "\n";
-    ui->lineEdit->setText("");
-    apply(curstr);
-}*/
-
-
 void MainWindow::bufferExec()//执行缓冲区的命令
 {
     QString curstr = cmd_buf.trimmed();
     apply(curstr, 0);
 }
 
-void MainWindow::Tokenize(QString &str,std::vector<Token> &tokens)
+void MainWindow::apply(QString &str, bool echo)
 {
-    Lexer * lexer = new Lexer(str);
+    if (echo)
+        setListenerText(str);
 
-    Token token;
-    do {
-        token = lexer->nextToken();
-        tokens.push_back(token);
-    } while (token.type != TokenType::END_OF_INPUT &&
-             token.type != TokenType::INVALID);
-    delete lexer;
+    if (!engine_)
+        return;
+
+    engine_->runLine(str);
+    ui->DefHint->setVisible(engine_->isDefining());
 }
 
-QString tokenTypeToString(TokenType type) {
-    switch (type) {
-    case TokenType::KEYWORD: return "KEYWORD";
-    case TokenType::IDENTIFIER: return "IDENTIFIER";
-    case TokenType::NUMBER: return "NUMBER";
-    case TokenType::OPERATOR: return "OPERATOR";
-    case TokenType::LPAREN: return "LPAREN";
-    case TokenType::RPAREN: return "RPAREN";
-    case TokenType::LBRACKET: return "LBRACKET";
-    case TokenType::RBRACKET: return "RBRACKET";
-    case TokenType::COMMA: return "COMMA";
-    case TokenType::SEMICOLON: return "SEMICOLON";
-    case TokenType::END_OF_INPUT: return "END_OF_INPUT";
-    case TokenType::INVALID: return "INVALID";
-    default: return "UNKNOWN";
-    }
-}
-
-void MainWindow::apply(QString &str,bool echo)//现在echo只为false
+void MainWindow::runScript(const QString &name, const QString &text)
 {
-    if(!Defmode)
-    {
-        if(echo)
-            setListenerText(str);
-        //singleStepParser(curstr);
-        //Parser(str);
-        vector<Token> tokens;
-        Tokenize(str, tokens);
-        std::reverse(tokens.begin(),tokens.end());
-        for (const auto& t : tokens) {
-            qDebug() << "Type: " << tokenTypeToString(t.type)
-            << "\tLexeme: " << t.lexeme << "\tLine: " << t.line
-                     << "\tColumn: " << t.column;
-        }
-        Parser(tokens);
-        if(Defmode)
-            ui->DefHint->show();
-    }
-    else
-    {
-        str = str.trimmed();
-        vector<Token> curstr;
-        Tokenize(str, curstr);
+    if (!engine_)
+        return;
 
-        Procs[Def_id].append(str);
-
-        for(auto &curToken : curstr)
-        {
-            qDebug() << curToken.lexeme;
-            if(curToken.lexeme == "END")//End of definition
-            {
-                Defmode = false;
-                ui->DefHint->hide();
-                if(!reDef) setListenerText(Def_name + " defined.");
-                else setListenerText(Def_name + " redefined.");
-                reverse(ProcTokens[Def_id].begin(), ProcTokens[Def_id].end());
-                break;
-            }
-            if(curToken.type == TokenType::END_OF_INPUT) continue;
-            ProcTokens[Def_id].push_back(curToken);
-        }
-    }
+    const logo::Source source(name, text);
+    engine_->runSource(source);
+    ui->DefHint->setVisible(engine_->isDefining());
 }
 
-bool MainWindow::checkType(QString & str)//检查是否为定义语句
-{
-    vector<Token> tokens;
-    Tokenize(str, tokens);
-    for(auto &token : tokens) {
-        if(token.type == TokenType::KEYWORD && token.lexeme == "TO")
-            return true;
-    }
-    return false;
-}
-
-//加载过程
-//将过程压缩成一行（除含 TO 的行）
 void MainWindow::loadFile()
 {
-    QString fname = QFileDialog::getOpenFileName(this,"选择一个文件...",QString(),"LOGO Files(*.lgo)");
+    const QString fname = QFileDialog::getOpenFileName(
+        this, "选择一个文件...", QString(), "LOGO Files(*.lgo)");
+    if (fname.isEmpty())
+        return;
+
     QFile file(fname);
-    if(!file.exists())
-    {
+    if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
         setListenerText("File open failed");
         return;
     }
 
     setListenerText("Loading from " + fname);
-    file.open(QIODevice::ReadOnly | QIODevice::Text);
-    QByteArray allLines = file.readAll();
-    QString text(allLines);
-    QStringList strs = text.split('\n');
-    //开始压缩
-    QString curText;
-    bool lastType = false;//type = true 表示该行存在TO
-    for(int i = 0;i < strs.size();i++)
-    {
-        bool thisType = checkType(strs[i]);
-        if(thisType || lastType) {
-            qDebug() << curText;
-            apply(curText);
-            curText = QString();
-        }
-        curText += strs[i] + " ";
-        lastType = thisType;
-        //apply(strs[i], false);
-    }
-    if(!curText.isEmpty())
-    {
-        qDebug() << curText;
-        apply(curText);
-        curText = QString();
-    }
-    /*
-    for(int i = 0;i < strs.size();i++)
-    {
-        apply(strs[i], false);
-    }*/
-    //text.replace("\n"," ");
-    //text.replace("\r"," ");
-    //apply(text, false);
+    const QString text = QString::fromUtf8(file.readAll());
+    runScript(fname, text);
 }
 
 //save all procedures
 bool MainWindow::saveFile(QString path)
 {
-    QSaveFile file(path);
-    if(file.open(QFile::WriteOnly | QFile::Text))
-    {
-        QTextStream out(&file);
-        for(auto &curProc : ProcNames)
-        {
-            out<<"TO "<<curProc.first<<'\n';
-            int idx = curProc.second - 1;
-            for(int i = 0;i < Procs[idx].size();i++)
-            {
-                out<<Procs[idx][i]<<'\n';
-            }
-            //out<<"END\n";
-        }
-        if(!file.commit())
-        {
-            QMessageBox::warning(this, "提示", "Failed to save!");
-            return false;
-        }
-    }
-    else
+    if (!engine_)
         return false;
+
+    QSaveFile file(path);
+    if (!file.open(QFile::WriteOnly | QFile::Text))
+        return false;
+
+    QTextStream out(&file);
+    const auto &definitions = engine_->definitions();
+    for (auto it = definitions.cbegin(); it != definitions.cend(); ++it) {
+        out << it.value();
+        if (!it.value().endsWith(QLatin1Char('\n')))
+            out << '\n';
+        out << '\n';
+    }
+
+    if (!file.commit()) {
+        QMessageBox::warning(this, "提示", "Failed to save!");
+        return false;
+    }
     return true;
 }
 
@@ -291,7 +184,6 @@ void MainWindow::openFile()
     }
 }
 
-PaintArea *PArea;
 void MainWindow::initPArea()
 {
     PArea = new PaintArea;
@@ -381,6 +273,11 @@ MainWindow::MainWindow(QWidget *parent)
     setWindowTitle("Beacon's LOGO(BC LOGO)");
     initPArea();
     initListener();
+
+    plotter_ = std::make_unique<QtPlotter>(PArea);
+    console_ = std::make_unique<QtConsole>(this);
+    engine_ = std::make_unique<logo::Engine>(*console_, *plotter_);
+
     setListenerText(curText);
 
     connect(ui->actionOpen,&QAction::triggered,this,&MainWindow::openFile);

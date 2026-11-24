@@ -3,20 +3,18 @@
  * beacon_cwk 25/04/23
 */
 
-#include "mainwindow.h"
-#include "QFileDialog"
-#include "ui_mainwindow.h"
-#include "QFile"
-#include "QLineEdit"
-#include "_cursor.h"
-#include "QPainter"
-#include "QPainterPath"
-
 #ifndef PAINT_H
 #define PAINT_H
 
-#include "qmainwindow.h"
-#endif // PAINT_H
+#include "_cursor.h"
+
+#include <QColor>
+#include <QFrame>
+#include <QLabel>
+#include <QMainWindow>
+#include <QPainter>
+#include <QPainterPath>
+#include <QPixmap>
 
 //QFrame_是画图区域本身，用于处理图形绘制
 const int paintHeight = 400, paintWidth = 900;
@@ -41,7 +39,7 @@ public : QPixmap *pixmap = new QPixmap(paintWidth, paintHeight);
     double x,y;//当前位置
     int penw = 1;
     QColor penc = Qt::black;
-    public : void paintEvent(QPaintEvent * event)
+    public : void paintEvent(QPaintEvent *)
     {
         QPainter painter(this);
         painter.setRenderHint(QPainter::SmoothPixmapTransform);
@@ -151,3 +149,5 @@ class PaintArea{
     QColor penColor() const { return frame->penc; }
     QColor backgroundColor() const { return bgc; }
 };
+
+#endif // PAINT_H

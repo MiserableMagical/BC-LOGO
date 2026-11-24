@@ -1,0 +1,3 @@
+# golden 报告按字节比较，禁止 Git 做换行转换
+tests/corpus/*.golden -text
+tests/corpus/*.lgo text eol=lf

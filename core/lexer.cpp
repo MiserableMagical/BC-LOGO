@@ -46,8 +46,8 @@ void Lexer::skipTrivia()
         if (c == QLatin1Char('\n') || c == QLatin1Char('\r'))
             return;
 
-        // 旧 Lexer 把 `:` 和 `'` 当作空白跳过；保持兼容。
-        if (c.isSpace() || c == QLatin1Char(':') || c == QLatin1Char('\'')) {
+        // `:` 是变量标记，不能当空白；`'` 也不再特殊处理。
+        if (c.isSpace()) {
             advance();
             continue;
         }
@@ -178,6 +178,36 @@ Token Lexer::scanWord()
     return make(TokenKind::Word, startOffset, startLine, startColumn);
 }
 
+Token Lexer::scanVariable()
+{
+    const int startOffset = pos_;
+    const int startLine = line_;
+    const int startColumn = column_;
+
+    advance(); // ':'
+
+    if (atEnd() || !(current().isLetter() || current() == QLatin1Char('_')
+                     || current() == QLatin1Char('#'))) {
+        return invalidToken(startOffset, startLine, startColumn,
+                            diag::kExpectedVariableName,
+                            QStringLiteral("expected a variable name after ':'"));
+    }
+
+    const int nameStart = pos_;
+    advance();
+    while (!atEnd()) {
+        const QChar c = current();
+        if (c.isLetterOrNumber() || c == QLatin1Char('_') || c == QLatin1Char('#'))
+            advance();
+        else
+            break;
+    }
+
+    Token token = make(TokenKind::Variable, startOffset, startLine, startColumn);
+    token.text = source_.text().mid(nameStart, pos_ - nameStart);
+    return token;
+}
+
 Token Lexer::scanQuotedWord()
 {
     const int startOffset = pos_;
@@ -283,6 +313,8 @@ Token Lexer::next()
         return scanNewline();
     if (c == QLatin1Char('"'))
         return scanQuotedWord();
+    if (c == QLatin1Char(':'))
+        return scanVariable();
     if (c.isDigit() || c == QLatin1Char('.'))
         return scanNumber();
     if (c.isLetter() || c == QLatin1Char('_') || c == QLatin1Char('#'))

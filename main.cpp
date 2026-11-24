@@ -2,6 +2,7 @@
 
 #include <QApplication>
 #include <QFile>
+#include <QFileInfo>
 #include <QStringList>
 #include <QTextStream>
 
@@ -67,17 +68,9 @@ int main(int argc, char *argv[])
     const QString text = QString::fromUtf8(in.readAll());
     in.close();
 
-    /* 与交互式输入保持同一路径：逐行喂给 bufferExec()，
-       这样 TO…END 的跨行定义行为和用户手敲完全一致。 */
+    /* 文件模式一次解析整份文本：TO…END、跨行的括号/块都能正确处理。 */
     w.clearTranscript();
-    const QStringList lines = text.split('\n');
-    for (const QString &raw : lines) {
-        QString line = raw;
-        if (line.endsWith('\r'))
-            line.chop(1);
-        w.cmd_buf = line;
-        w.bufferExec();
-    }
+    w.runScript(QFileInfo(scriptPath).fileName(), text);
 
     QString report = "--- state ---\n" + w.stateSnapshot()
                    + "--- transcript ---\n" + w.transcript();

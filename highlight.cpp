@@ -3,14 +3,11 @@
  * beacon_cwk 25/02/14
 */
 
-#include "mainwindow.h"
 #include "mylistener.h"
+#include "core/builtins.h"
 #include "QTextCharFormat"
 
-using std::set;
-using std::map;
-extern map<QString,Keywords> defaultNames;
-extern map<QString,Keywords> mathFunctions;
+#include <QStringList>
 
 MyHighlighter::MyHighlighter(QTextDocument *parent)
     : QSyntaxHighlighter(parent) {
@@ -30,17 +27,10 @@ MyHighlighter::MyHighlighter(QTextDocument *parent)
 
     // 添加关键字高亮规则
     QStringList keywordPatterns;
-    //keywordPatterns << "\\bif\\b" << "\\belse\\b" << "\\bwhile\\b"
-    //                << "\\breturn\\b" << "\\bclass\\b" << "\\bvoid\\b";
-    for(auto &str : defaultNames)
-    {
-        keywordPatterns << "\\b" + str.first + "\\b";
+    for (const QString &word : logo::logoVocabulary()) {
+        keywordPatterns << QStringLiteral("\\b") + QRegularExpression::escape(word)
+                               + QStringLiteral("\\b");
     }
-    for(auto &str : mathFunctions)
-    {
-        keywordPatterns << "\\b" + str.first + "\\b";
-    }
-    //keywordPatterns << "\\bREPEAT\\b" << "\\bTO\\b" << "";
 
     foreach (const QString &pattern, keywordPatterns) {
         HighlightingRule rule;

@@ -7,7 +7,8 @@
 namespace logo {
 
 enum class TokenKind {
-    Word,       // FD / x / #FF0000；不再区分关键字，语义留给 Parser
+    Word,       // 过程名/命令名；未加引号的裸词
+    Variable,   // :name；text 不含冒号
     Number,
     Operator,   // + - * / % = < > <= >= & |
     LParen,
@@ -34,6 +35,7 @@ inline const char *tokenKindName(TokenKind kind)
 {
     switch (kind) {
     case TokenKind::Word: return "Word";
+    case TokenKind::Variable: return "Variable";
     case TokenKind::Number: return "Number";
     case TokenKind::Operator: return "Operator";
     case TokenKind::LParen: return "LParen";
