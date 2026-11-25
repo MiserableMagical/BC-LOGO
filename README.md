@@ -4,7 +4,7 @@ BC LOGO 是一个用 **Qt 6 / C++17** 重写的 PC Logo 风格解释器。它保
 
 ![BC LOGO 主界面](docs/images/main-window.png)
 
-> 界面由菜单栏、绘图区和交互式命令行（听者 / Listener）组成。图中红色标注来自旧版帮助，仅用于说明区域。
+> 界面由菜单栏、绘图区和交互式命令行（听者 / Listener）组成。
 
 ## 特性
 
@@ -17,7 +17,7 @@ BC LOGO 是一个用 **Qt 6 / C++17** 重写的 PC Logo 风格解释器。它保
 - 数学/逻辑：`SIN`、`COS`（角度制）、`RANDOM`、`AND`、`OR`、比较与四则运算。
 - 文件加载、过程定义保存、画布导出 JPEG。
 - 自带编辑器：保存、撤销、剪切、复制、粘贴。
-- 71 项核心单元测试 + 10 万次随机输入 fuzz + 22 个端到端语料。
+- V2 版本在 V1.0 版本的基础上完全重构了后端的解释器部分，并修复了多个命令执行中的漏洞。
 
 ## 快速开始
 
@@ -117,26 +117,6 @@ C:\Qt\6.7.3\mingw_64\bin\windeployqt.exe --no-translations `
 
 详见 [docs/build-and-run.md](docs/build-and-run.md)。
 
-## 测试
-
-```powershell
-powershell -ExecutionPolicy Bypass -File tests\run_all.ps1
-```
-
-包含：
-
-- `CoreTest`：71 项单元测试；
-- `FuzzTest`：固定种子 10 万条随机源码，Lexer/Parser 不崩溃；
-- `corpus`：22 个端到端脚本，比较终态、画布 SHA-1 和听者输出。
-
-只跑单元/fuzz：
-
-```powershell
-powershell -ExecutionPolicy Bypass -File tests\run_all.ps1 -SkipCorpus
-```
-
-CI 配置见 [.github/workflows/ci.yml](.github/workflows/ci.yml)：Ubuntu 上构建 app 和测试并运行单元/fuzz；语料基线在 Windows 本地跑。
-
 ## 项目结构
 
 ```text
@@ -157,12 +137,7 @@ docs/           设计文档、命令参考、行为变更
 并同步到当前 `:X` / `"X` 语法。旧帮助中的无冒号变量、无引号颜色等写法请勿继续使用。
 
 - [命令与语法参考](docs/logo-reference.md)
-- [Parser 设计](docs/parser.md)
-- [AST 设计](docs/ast.md)
-- [Interpreter 设计](docs/interpreter.md)
 - [构建与运行](docs/build-and-run.md)
-- [有意行为变更](docs/behavior-changes.md)
-- [测试说明](tests/README.md)
 
 ## 已知限制
 

@@ -21,7 +21,7 @@
 #include "qtconsole.h"
 #include "qtplotter.h"
 
-QString version = "V2.0";
+QString version = "V2.0-RC";
 QString curText = "Beacon's Logo " + version + " for Windows x64\nWenkai Cheng\n";
 
 myListener *Lis;
@@ -225,7 +225,7 @@ void MainWindow::About()
     static QString aboutText = "Beacon's LOGO(BC LOGO) " + version + '\n'
         + "Author: beacon_cwk\n"
         + "QQ/Email: 2733630473@qq.com\n"
-        + "Used for study methods\n"
+        + "For study methods\n"
         + "Thank you for trying this software!";
     text->setText(aboutText);
     text->setAlignment(Qt::AlignCenter);
@@ -235,7 +235,7 @@ void MainWindow::About()
 
 void MainWindow::showHelp()
 {
-    QString pdfPath = qApp->applicationDirPath() + "/help.pdf";
+    QString pdfPath = qApp->applicationDirPath() + "/docs/logo-reference.pdf";
     QDesktopServices::openUrl(QUrl::fromLocalFile(pdfPath));
 }
 
