@@ -1,9 +1,5 @@
 # BC LOGO V2 命令与语法参考
 
-本文档与当前仓库的 **新 Lexer / Parser / Interpreter** 同步，取代旧版 `help.docx` 中已经过时的变量和命令写法。
-
-- 适用版本：BC LOGO（当前开发版，GUI 标题 `Beacon's LOGO(BC LOGO)`）
-- 返回值文档：`OUTPUT` / `OP`
 - 命令、过程名、变量名均大小写不敏感；文档里用大写只是为了易读。
 
 > 旧版帮助里常见的 `MAKE X 10`、`PRINT X`、`FD X` 已经不能运行。
